@@ -17,25 +17,25 @@ const router = createRouter({
 			path: '/dashboard',
 			name: 'dashboard',
 			component: DashboardView,
-			meta: { requiresAuth: true }
+			meta: { requiresAuth: true },
 		},
 		{
 			path: '/history',
 			name: 'history',
 			component: HistoryView,
-			meta: { requiresAuth: true }
+			meta: { requiresAuth: true },
 		},
 		{
 			path: '/measurements',
 			name: 'measurements',
 			component: MeasurementsView,
-			meta: { requiresAuth: true }
+			meta: { requiresAuth: true },
 		},
 		{
 			path: '/settings',
 			name: 'settings',
 			component: SettingsView,
-			meta: { requiresAuth: true }
+			meta: { requiresAuth: true },
 		},
 	],
 });

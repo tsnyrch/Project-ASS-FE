@@ -31,8 +31,8 @@ export const useUserStore = defineStore('user', {
 					data,
 				);
 				this.token = response.data.accessToken;
-				// nastavení hlavičky Authorization pro všechny HTTP požadavky odeslané pomocí Axios
-				// axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token;
+				// Set authorization header for all requests
+				axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token;
 				localStorage.setItem('token', this.token);
 				sessionStorage.setItem('first_name', response.data.firstName);
 				sessionStorage.setItem('last_name', response.data.lastName);
@@ -42,6 +42,16 @@ export const useUserStore = defineStore('user', {
 			} catch (e) {
 				this.error = 'Cannot log in! ' + e;
 				this.isLoggedIn = false;
+			}
+		},
+
+		// Add a method to initialize token from localStorage
+		initializeToken() {
+			const token = localStorage.getItem('token');
+			if (token) {
+				this.token = token;
+				axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+				this.isLoggedIn = true;
 			}
 		},
 

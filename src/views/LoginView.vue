@@ -17,7 +17,7 @@
 
 					<v-form v-model="form" @submit.prevent="onSubmit">
 						<v-text-field
-                            :error="error"
+							:error="error"
 							variant="outlined"
 							v-model="userName"
 							:readonly="loading"
@@ -25,11 +25,11 @@
 							class="tw-mb-2 tw-w-96"
 							label="Přihlašovací jméno"
 							clearable
-                            @input="clearErrors"
+							@input="clearErrors"
 						></v-text-field>
 
 						<v-text-field
-                            :error="error"
+							:error="error"
 							:append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
 							:type="visible ? 'text' : 'password'"
 							@click:append-inner="visible = !visible"
@@ -40,7 +40,7 @@
 							label="Password"
 							placeholder="Zadejte heslo"
 							clearable
-                            @input="clearErrors"
+							@input="clearErrors"
 						></v-text-field>
 
 						<PrimaryButton
@@ -61,7 +61,7 @@
 import { ref } from 'vue';
 import PrimaryButton from '@/components/button/PrimaryButton.vue';
 import { useRouter } from 'vue-router';
-import {useUserStore} from "@/stores/UserStore.js";
+import { useUserStore } from '@/stores/UserStore.js';
 
 // Definování reaktivních dat
 const form = ref(false);
@@ -80,21 +80,21 @@ const rules = {
 };
 
 const clearErrors = () => {
-    error.value = false;
+	error.value = false;
 };
 
 const onSubmit = async () => {
-    if (!form.value) return;
+	if (!form.value) return;
 
-    loading.value = true;
+	loading.value = true;
 
-    await store.login(userName.value, password.value);
-    loading.value = false;
-    if (store.isLoggedIn) {
-        await router.push({path: '/dashboard'});
-    } else {
-        error.value = true;
-        console.log(error.value);
-    }
+	await store.login(userName.value, password.value);
+	loading.value = false;
+	if (store.isLoggedIn) {
+		await router.push({ path: '/dashboard' });
+	} else {
+		error.value = true;
+		console.log(error.value);
+	}
 };
 </script>

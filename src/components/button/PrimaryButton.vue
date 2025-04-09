@@ -14,16 +14,15 @@ const props = defineProps({
 	text: String,
 	icon: String,
 	size: String,
-    bgColor: {
-        type: String,
-        default: 'tw-bg-mendelu-green'
-    }
+	bgColor: {
+		type: String,
+		default: 'tw-bg-mendelu-green',
+	},
 });
 
 const emit = defineEmits(['click']);
 
-const buttonClass =
-	'tw-rounded-xl tw-text-white tw-normal-case';
+const buttonClass = 'tw-rounded-xl tw-text-white tw-normal-case';
 
 const onClick = () => {
 	emit('click');

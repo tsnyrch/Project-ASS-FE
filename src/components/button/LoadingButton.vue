@@ -23,7 +23,7 @@ export default {
 	name: 'LoadingButton',
 
 	props: {
-        loading: Boolean,
+		loading: Boolean,
 		text: String,
 		loadingText: String,
 		size: String,

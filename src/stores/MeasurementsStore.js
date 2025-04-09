@@ -19,19 +19,31 @@ export const useMeasurementsStore = defineStore('measurements', {
 	actions: {
 		async fetchMeasurementsData(measurementId) {
 			try {
-				const reposnse = await axios.get(
+				const token = localStorage.getItem('token');
+				const response = await axios.get(
 					config.backendUrl + '/measurements/' + measurementId,
+					{
+						headers: {
+							Authorization: 'Bearer ' + token,
+						},
+					},
 				);
+				// Handle response data here
+				return response.data;
 			} catch (error) {
 				this.error = 'Cannot get measurements data ' + error;
 			}
 		},
 		async downloadMeasurementZip(measurementId) {
 			try {
+				const token = localStorage.getItem('token');
 				const response = await axios.get(
 					`${config.backendUrl}/measurements/${measurementId}`,
 					{
 						responseType: 'blob',
+						headers: {
+							Authorization: 'Bearer ' + token,
+						},
 					},
 				);
 				return new Blob([response.data], { type: 'application/zip' });
@@ -41,10 +53,19 @@ export const useMeasurementsStore = defineStore('measurements', {
 		},
 		async fetchManualMeasurementConfig() {
 			try {
+				const token = localStorage.getItem('token');
 				const response = await axios.get(
 					config.backendUrl + '/measurements/start',
+					{
+						headers: {
+							Authorization: 'Bearer ' + token,
+						},
+					},
 				);
+				// Store response data in state
+				this.measurementConfig = response.data;
 				this.error = null;
+				return response.data;
 			} catch (error) {
 				this.error = 'Cannot get manual measurement configuration ' + error;
 			}

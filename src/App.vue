@@ -1,6 +1,6 @@
 <template>
 	<v-app>
-		<Sidebar v-if=!isLoginRoute  />
+		<Sidebar v-if="!isLoginRoute" />
 		<v-main>
 			<v-container>
 				<router-view />
@@ -40,7 +40,6 @@ defineExpose({ login, logout });
 </script>
 
 <style>
-
 nav {
 	margin-bottom: 1em;
 }
