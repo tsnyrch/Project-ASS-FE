@@ -12,7 +12,7 @@
 <script setup>
 import { Icon } from '@iconify/vue';
 import Sidebar from '@/components/Sidebar.vue';
-//import { useUserStore } from './stores/UserStore';
+import { useUserStore } from './stores/UserStore';
 import { useRouter } from 'vue-router';
 import { computed } from 'vue';
 
@@ -21,6 +21,10 @@ const router = useRouter();
 const isLoginRoute = computed(() => router.currentRoute.value.name === 'login');
 
 defineExpose({ Sidebar, Icon, isLoginRoute });
+
+const userStore = useUserStore();
+userStore.initializeToken();
+
 /*
 const userStore = useUserStore();
 

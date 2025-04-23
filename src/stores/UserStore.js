@@ -10,30 +10,22 @@ export const useUserStore = defineStore('user', {
 		isLoggedIn: null,
 		users: [],
 	}),
-	/*const oldToken = localStorage.getItem('token');
-
-		if (oldToken) {
-			axios.defaults.headers.common['Authorization'] = 'Bearer ' + oldToken;
-		}
-*/
 
 	getters: {
-		//isAuthenticated: (state) => state.token !== null,
-		/*	user: (state) => jwtDecode(state.token),*/
+		// Add getters as needed
 	},
 
 	actions: {
+		// Log in and store token
 		async login(userName, password) {
 			try {
 				const data = { userName, password };
-				const response = await axios.post(
-					config.backendUrl + '/users/login',
-					data,
-				);
+				const response = await axios.post(`${config.backendUrl}/users/login`, data);
+
 				this.token = response.data.accessToken;
-				// Set authorization header for all requests
-				axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token;
 				localStorage.setItem('token', this.token);
+				axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token;
+
 				sessionStorage.setItem('first_name', response.data.firstName);
 				sessionStorage.setItem('last_name', response.data.lastName);
 
@@ -45,7 +37,7 @@ export const useUserStore = defineStore('user', {
 			}
 		},
 
-		// Add a method to initialize token from localStorage
+		// Restore token on app reload
 		initializeToken() {
 			const token = localStorage.getItem('token');
 			if (token) {
@@ -55,15 +47,23 @@ export const useUserStore = defineStore('user', {
 			}
 		},
 
+		// Clear auth and token
 		logout() {
 			this.token = null;
 			delete axios.defaults.headers.common['Authorization'];
 			localStorage.removeItem('token');
+			this.isLoggedIn = false;
 		},
 
+		// Get user list
 		async fetchUsers() {
 			try {
-				const response = await axios.get(config.backendUrl + '/users');
+				const token = this.token || localStorage.getItem('token');
+				const response = await axios.get(`${config.backendUrl}/users`, {
+					headers: {
+						Authorization: 'Bearer ' + token,
+					},
+				});
 				this.users = response.data;
 				this.error = null;
 			} catch (error) {
@@ -71,23 +71,24 @@ export const useUserStore = defineStore('user', {
 			}
 		},
 
+		// Add user
 		async addUser(data) {
 			try {
-				const response = await axios.post(config.backendUrl + '/users', data);
-				this.user = response.data;
+				const token = this.token || localStorage.getItem('token');
+				const response = await axios.post(`${config.backendUrl}/users`, data, {
+					headers: {
+						Authorization: 'Bearer ' + token,
+					},
+				});
+				this.users.push(response.data);
 				this.error = null;
 			} catch (error) {
 				this.error = 'Cannot add user ' + error;
 			}
 		},
 
-		/*
-		setLoginMessage(message) {
-			this.loginMessage = message;
-		},
-
 		clearError() {
 			this.error = null;
-		},*/
+		},
 	},
 });

@@ -21,19 +21,19 @@ export const useMeasurementsStore = defineStore('measurements', {
 			try {
 				const token = localStorage.getItem('token');
 				const response = await axios.get(
-					config.backendUrl + '/measurements/' + measurementId,
+					`${config.backendUrl}/measurements/${measurementId}`,
 					{
 						headers: {
 							Authorization: 'Bearer ' + token,
 						},
-					},
+					}
 				);
-				// Handle response data here
 				return response.data;
 			} catch (error) {
 				this.error = 'Cannot get measurements data ' + error;
 			}
 		},
+
 		async downloadMeasurementZip(measurementId) {
 			try {
 				const token = localStorage.getItem('token');
@@ -44,25 +44,25 @@ export const useMeasurementsStore = defineStore('measurements', {
 						headers: {
 							Authorization: 'Bearer ' + token,
 						},
-					},
+					}
 				);
 				return new Blob([response.data], { type: 'application/zip' });
 			} catch (error) {
 				this.error = 'Cannot download measurement ZIP ' + error;
 			}
 		},
+
 		async fetchManualMeasurementConfig() {
 			try {
 				const token = localStorage.getItem('token');
 				const response = await axios.get(
-					config.backendUrl + '/measurements/start',
+					`${config.backendUrl}/measurements/start`,
 					{
 						headers: {
 							Authorization: 'Bearer ' + token,
 						},
-					},
+					}
 				);
-				// Store response data in state
 				this.measurementConfig = response.data;
 				this.error = null;
 				return response.data;
@@ -70,10 +70,17 @@ export const useMeasurementsStore = defineStore('measurements', {
 				this.error = 'Cannot get manual measurement configuration ' + error;
 			}
 		},
+
 		async fetchLatestMeasurements() {
 			try {
+				const token = localStorage.getItem('token');
 				const response = await axios.get(
-					config.backendUrl + '/measurements/latest',
+					`${config.backendUrl}/measurements/latest`,
+					{
+						headers: {
+							Authorization: 'Bearer ' + token,
+						},
+					}
 				);
 				this.measurementInfo = {
 					...this.measurementInfo,
@@ -87,13 +94,18 @@ export const useMeasurementsStore = defineStore('measurements', {
 				this.error = 'Cannot get latest measurements ' + error;
 			}
 		},
+
 		async fetchMeasurementHistory(startDate, endDate) {
 			try {
+				const token = localStorage.getItem('token');
 				const response = await axios.get(
-					config.backendUrl + '/measurements/history',
+					`${config.backendUrl}/measurements/history`,
 					{
+						headers: {
+							Authorization: 'Bearer ' + token,
+						},
 						params: { startDate, endDate },
-					},
+					}
 				);
 				this.measurementHistory = response.data;
 				this.error = null;
@@ -102,10 +114,17 @@ export const useMeasurementsStore = defineStore('measurements', {
 				this.error = 'Cannot get measurement history ' + error;
 			}
 		},
+
 		async fetchMeasurementConfig() {
 			try {
+				const token = localStorage.getItem('token');
 				const response = await axios.get(
-					config.backendUrl + '/settings/measurementConfig',
+					`${config.backendUrl}/settings/measurementConfig`,
+					{
+						headers: {
+							Authorization: 'Bearer ' + token,
+						},
+					}
 				);
 				this.measurementConfig = response.data;
 				this.error = null;
@@ -113,11 +132,18 @@ export const useMeasurementsStore = defineStore('measurements', {
 				this.error = 'Cannot get measurement configuration ' + error;
 			}
 		},
+
 		async updateMeasurementConfig(data) {
 			try {
+				const token = localStorage.getItem('token');
 				const response = await axios.put(
-					config.backendUrl + '/settings/measurementConfig',
+					`${config.backendUrl}/settings/measurementConfig`,
 					data,
+					{
+						headers: {
+							Authorization: 'Bearer ' + token,
+						},
+					}
 				);
 				this.measurementConfig = response.data;
 				this.error = null;
@@ -125,6 +151,7 @@ export const useMeasurementsStore = defineStore('measurements', {
 				this.error = 'Cannot update measurement configuration ' + error;
 			}
 		},
+
 		clearError() {
 			this.error = null;
 		},
