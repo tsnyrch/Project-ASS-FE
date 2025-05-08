@@ -4,140 +4,153 @@
 			<v-container>
 				<v-row>
 					<v-col>
-						<div class="tw-text-2xl">Nastavení</div>
+						<div class="tw-text-2xl">Nastavení měření</div>
+					</v-col>
+				</v-row>
+				<v-row align="start" justify="start">
+					<v-col cols="auto">
+						<MeasurementWidget
+							title="Poslední měření"
+							:datetime="store.measurementInfo.lastMeasurement"
+						/>
+					</v-col>
+					<v-col cols="auto">
+						<MeasurementWidget
+							title="Plánované měření"
+							:datetime="store.measurementInfo.plannedMeasurement"
+						/>
 					</v-col>
 				</v-row>
 				<v-row>
 					<v-col>
-						<div class="tw-text-xl">Seznam uživatelů</div>
+						<div class="tw-text-xl">Plán automatického měření</div>
 					</v-col>
 				</v-row>
-				<v-row v-for="(user, index) in users" :key="index" class="ma-0">
-					<v-col class="pa-0">
-						<v-card class="mx-auto tw-bg-light-grey mt-4" variant="flat">
-							<v-row>
-								<v-col cols="12" sm="4">
-									<v-card-title
-										class="d-flex justify-start align-center text-center text-body-1"
-									>
-										<v-icon class="pr-3"> mdi-account-circle-outline</v-icon>
-										{{ user.firstName }} {{ user.lastName }}
-									</v-card-title>
-								</v-col>
-							</v-row>
-						</v-card>
+				<v-row>
+					<v-col cols="4">
+						<v-text-field
+							v-model="measurementFrequency"
+							type="number"
+							min="0"
+							class="tw-pl-3"
+							label="Doba mezi dvěma měřeními"
+							placeholder="Zadejte délku v minutách"
+							variant="underlined"
+						></v-text-field>
+					</v-col>
+					<v-col cols="4" offset="2">
+						<p>Datum a čas prvního měření</p>
+						<DateTimePickerSingle v-model:date="measurementDate" />
 					</v-col>
 				</v-row>
 				<v-row>
 					<v-col>
-						<div class="tw-text-xl">Přidat nového uživatele</div>
+						<div class="tw-text-xl">Parametry měření</div>
 					</v-col>
 				</v-row>
-				<v-row>
-					<v-col>
-						<v-text-field
-							v-model="firstName"
-							label="Zadejte jméno"
-							density="compact"
-							variant="outlined"
-							clearable
-							:error-messages="firstNameError ? ['Neplatné jméno'] : []"
-							@blur="validate(firstName)"
-							@click:clear="clearError(firstNameError)"
-						></v-text-field>
-					</v-col>
-					<v-col>
-						<v-text-field
-							v-model="lastName"
-							label="Zadejte příjmení"
-							density="compact"
-							variant="outlined"
-							clearable
-							:error-messages="lastNameError ? ['Neplatné příjmení'] : []"
-							@blur="validate(lastName)"
-							@click:clear="clearError(lastNameError)"
-						></v-text-field>
-					</v-col>
-					<v-col>
-						<v-text-field
-							v-model="userName"
-							label="Zadejte uživatelské jméno"
-							density="compact"
-							variant="outlined"
-							clearable
-							:error-messages="
-								userNameError ? ['Neplatné uživatelské jméno'] : []
-							"
-							@blur="validate(userName)"
-							@click:clear="clearError(userNameError)"
-						></v-text-field>
-					</v-col>
-					<v-col>
-						<PrimaryButton @click="addUser" text="Přidat uživatele" />
-					</v-col>
-				</v-row>
+				<MeasurementSettings
+					:multispectralCameraChecked="multispectralCameraChecked"
+					@update:multispectralCameraChecked="updateMultispectralCameraChecked"
+					:measurementDuration="measurementDuration"
+					@update:measurementDuration="updateMeasurementDuration"
+					:rgbCameraChecked="rgbCameraChecked"
+					@update:rgbCameraChecked="updateRgbCameraChecked"
+					:selectedSensorCount="selectedSensorCount"
+					@update:selectedSensorCount="updateSelectedSensorCount"
+					:rgbCameraSensors="rgbCameraSensors"
+				/>
 			</v-container>
+			<PrimaryButton text="Uložit nastavení" @click="updateConfig()" />
 		</v-main>
 	</v-app>
 </template>
 
 <script setup>
+import { ref, computed, watch } from 'vue';
+import MeasurementWidget from '@/components/measurements/MeasurementWidget.vue';
+import moment from 'moment';
+import MeasurementSettings from '@/components/measurements/MeasurementSettings.vue';
+import DateTimePickerSingle from '@/components/datepickers/DateTimePickerSingle.vue';
 import PrimaryButton from '@/components/button/PrimaryButton.vue';
-import { useUserStore } from '@/stores/UserStore';
-import { ref, onMounted, computed } from 'vue';
+import { useMeasurementsStore } from '@/stores/MeasurementsStore';
+import { onMounted } from 'vue';
 
-const store = useUserStore();
+const emits = defineEmits(['update:measurementFrequency']);
 
-onMounted(() => {
-	store.fetchUsers();
+const firstDate = moment('19.3.2024 13:30', 'DD.MM.YYYY HH:mm');
+
+const store = useMeasurementsStore();
+const loading = ref(true);
+
+const measurements = computed(() => store.measurementInfo.latestMeasurement);
+const measurementsConfig = computed(() => store.measurementConfig);
+
+const multispectralCameraChecked = ref(
+	measurementsConfig.value.multispectralCamera,
+);
+const measurementDuration = ref(measurementsConfig.value.lengthOfAE);
+const rgbCameraChecked = ref(measurementsConfig.value.rgbCamera);
+const selectedSensorCount = ref(measurementsConfig.value.numberOfSensors);
+const rgbCameraSensors = ref([1, 2, 3, 4, 5, 6]);
+const measurementFrequency = ref(measurementsConfig.value.measurementFrequency);
+const measurementDate = ref(
+	measurementsConfig?.value?.firstMeasurement ?? Date.now(),
+);
+
+onMounted(async () => {
+	await store.fetchLatestMeasurements();
+	loading.value = true;
+	await store.fetchMeasurementConfig();
+
+	measurementDuration.value = store.measurementConfig.lengthOfAE;
+	multispectralCameraChecked.value =
+		store.measurementConfig.multispectralCamera;
+	rgbCameraChecked.value = store.measurementConfig.rgbCamera;
+	selectedSensorCount.value = store.measurementConfig.numberOfSensors;
+	measurementFrequency.value = store.measurementConfig.measurementFrequency;
+	measurementDate.value = store.measurementConfig.firstMeasurement;
+	loading.value = false;
 });
 
-const users = computed(() => store.users);
-
-const firstName = ref('');
-const lastName = ref('');
-const userName = ref('');
-const firstNameError = ref(false);
-const lastNameError = ref(false);
-const userNameError = ref(false);
-
-const validate = (inp) => {
-	console.log(inp.value);
-	if (inp.value !== null) {
-		inp.value = inp.value !== '';
-	}
-};
-
-const clearError = (inp) => {
-	inp.value = false;
-};
-
-function addUser() {
-	if (firstName.value === '') {
-		firstNameError.value = true;
-		return;
-	} else firstNameError.value = false;
-	if (lastName.value === '') {
-		lastNameError.value = true;
-		return;
-	} else lastNameError.value = false;
-	if (userName.value === '') {
-		userNameError.value = true;
-		return;
-	} else userNameError.value = false;
+function updateConfig() {
 	try {
 		const data = {
-			firstName: firstName.value,
-			lastName: lastName.value,
-			userName: userName.value,
-			password: 'admin',
-			isAdmin: false,
+			measurementFrequency: measurementFrequency.value,
+			firstMeasurement: measurementDate.value,
+			rgbCamera: rgbCameraChecked.value,
+			multispectralCamera: multispectralCameraChecked.value,
+			numberOfSensors: selectedSensorCount.value,
+			lengthOfAE: Number(measurementDuration.value),
 		};
-		store.addUser(data);
-		users.value.push(data);
+		// Turned off for debugging
+		// TODO: store.updateMeasurementConfig(data);
 	} catch (error) {
 		store.error = error.message;
 	}
+}
+
+watch(measurementFrequency, (newValue) => {
+	emits('update:measurementFrequency', newValue);
+});
+
+function updateMultispectralCameraChecked(value) {
+	multispectralCameraChecked.value = value;
+}
+
+function updateMeasurementDuration(value) {
+	measurementDuration.value = Number(value);
+}
+
+function updateRgbCameraChecked(value) {
+	rgbCameraChecked.value = value;
+}
+
+function updateSelectedSensorCount(value) {
+	selectedSensorCount.value = value;
+}
+
+function toggleSettings() {
+	showSettings.value = !showSettings.value;
 }
 </script>
 

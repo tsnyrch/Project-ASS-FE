@@ -24,19 +24,19 @@
 				></v-list-item>
 				<v-list-item
 					prepend-icon="mdi-history"
-					title="Historie"
+					title="Historie měření"
 					:to="{ name: 'history' }"
 				></v-list-item>
 				<v-list-item
-					prepend-icon="mdi-chart-line"
-					title="Měření"
-					:to="{ name: 'measurements' }"
+					prepend-icon="mdi-cog-outline"
+					title="Nastavení měření"
+					:to="{ name: 'settings' }"
 				>
 				</v-list-item>
 				<v-list-item
-					prepend-icon="mdi-cog-outline"
-					title="Nastavení"
-					:to="{ name: 'settings' }"
+					prepend-icon="mdi-account-outline"
+					title="Správa uživatel"
+					:to="{ name: 'users' }"
 				></v-list-item>
 			</v-list>
 			<template v-slot:append>

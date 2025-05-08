@@ -9,7 +9,7 @@
 			<v-container>
 				<v-row>
 					<v-col>
-						<div class="tw-text-2xl">History</div>
+						<div class="tw-text-2xl">Historie měření</div>
 					</v-col>
 				</v-row>
 				<v-row>
@@ -31,9 +31,9 @@
 							<template v-slot:top>
 								<v-toolbar flat dense class="tw-bg-white">
 									<v-toolbar-title
-										>Měření v intervalu
+										>Měření mezi
 										{{ moment(defaultStartDate).format('DD.MM.YYYY HH:mm:ss') }}
-										- {{ moment(defaultEndDate).format('DD.MM.YYYY HH:mm:ss') }}
+										– {{ moment(defaultEndDate).format('DD.MM.YYYY HH:mm:ss') }}
 									</v-toolbar-title>
 								</v-toolbar>
 							</template>
@@ -46,11 +46,11 @@
 							</thead>
 							<tbody>
 								<tr v-for="item in pagedMeasurements" :key="item.name">
-									<td>{{ formatDateMinutes(item.dateTime) }}</td>
-									<td>{{ item.numberOfSensors }}</td>
-									<td>{{ item.lengthOfAE }}</td>
-									<td>{{ item.rgbCamera ? 'Ano' : 'Ne' }}</td>
-									<td>{{ item.multispectralCamera ? 'Ano' : 'Ne' }}</td>
+									<td>{{ formatDateMinutes(item.date_time) }}</td>
+									<td>{{ item.number_of_sensors }}</td>
+									<td>{{ item.length_of_ae }}</td>
+									<td>{{ item.rgb_camera ? 'Ano' : 'Ne' }}</td>
+									<td>{{ item.multispectral_camera ? 'Ano' : 'Ne' }}</td>
 									<td>{{ item.scheduled ? 'Ano' : 'Ne' }}</td>
 									<td>
 										<PrimaryButton
@@ -94,7 +94,7 @@ onMounted(() => {
 	store.fetchMeasurementHistory(defaultStartDate.value, defaultEndDate.value);
 });
 
-const measurements = computed(() => store.measurementHistory);
+const measurements = computed(() => store.measurementHistory.measurements);
 
 const headers = [
 	{ text: 'Datum a čas', value: 'date' },
@@ -110,12 +110,13 @@ const page = ref(1);
 const itemsPerPage = 15;
 const totalVisible = 4;
 
-const totalItems = computed(() => measurements.value.length);
+const totalItems = computed(() => measurements.value?.length ?? 0);
 const pageCount = computed(() => Math.ceil(totalItems.value / itemsPerPage));
 
 const pagedMeasurements = computed(() => {
+	const all = Array.isArray(measurements.value) ? measurements.value : [];
 	const startIndex = (page.value - 1) * itemsPerPage;
-	return measurements.value.slice(startIndex, startIndex + itemsPerPage);
+	return all.slice(startIndex, startIndex + itemsPerPage);
 });
 
 const rangeText = computed(() => {
@@ -140,7 +141,12 @@ watch([defaultStartDate, defaultEndDate], () => {
 		defaultEndDate.value,
 		'DD.MM.YYYY HH:mm:ss',
 	).format('YYYY-MM-DDTHH:mm:ss');
-	store.fetchMeasurementHistory(formattedStartDate, formattedEndDate);
+
+	if (formattedStartDate !== "Invalid date" && formattedEndDate !== "Invalid date") {
+			store.fetchMeasurementHistory(formattedStartDate, formattedEndDate);
+	} else {
+		console.error("Invalid history date range:", formattedStartDate, "–",  formattedEndDate);
+	}
 });
 
 const downloadData = async (item) => {

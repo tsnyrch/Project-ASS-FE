@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import DashboardView from '../views/DashboardView.vue';
 import HistoryView from '../views/HistoryView.vue';
-import MeasurementsView from '../views/MeasurementsView.vue';
 import SettingsView from '../views/SettingsView.vue';
+import UsersView from '../views/UsersView.vue';
 import LoginView from '../views/LoginView.vue';
 
 const router = createRouter({
@@ -26,15 +26,15 @@ const router = createRouter({
 			meta: { requiresAuth: true },
 		},
 		{
-			path: '/measurements',
-			name: 'measurements',
-			component: MeasurementsView,
-			meta: { requiresAuth: true },
-		},
-		{
 			path: '/settings',
 			name: 'settings',
 			component: SettingsView,
+			meta: { requiresAuth: true },
+		},
+		{
+			path: '/users',
+			name: 'users',
+			component: UsersView,
 			meta: { requiresAuth: true },
 		},
 	],

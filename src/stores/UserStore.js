@@ -17,17 +17,29 @@ export const useUserStore = defineStore('user', {
 
 	actions: {
 		// Log in and store token
-		async login(userName, password) {
+		async login(username, password) {
 			try {
-				const data = { userName, password };
-				const response = await axios.post(`${config.backendUrl}/users/login`, data);
+				const params = new URLSearchParams();
+				params.append('username', username);
+				params.append('password', password);
 
-				this.token = response.data.accessToken;
+				const response = await axios.post(`${config.backendUrl}/users/login`, params, {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+				});
+
+				this.token = response.data.access_token;
 				localStorage.setItem('token', this.token);
 				axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token;
 
-				sessionStorage.setItem('first_name', response.data.firstName);
-				sessionStorage.setItem('last_name', response.data.lastName);
+				// extract user information from JWT token
+				const user = JSON.parse(atob(this.token.split('.')[1]));
+
+				console.log("Login successful:", response.data);
+
+				sessionStorage.setItem('first_name', user.first_name || '');
+				sessionStorage.setItem('last_name', user.last_name || '');
 
 				this.error = null;
 				this.isLoggedIn = true;

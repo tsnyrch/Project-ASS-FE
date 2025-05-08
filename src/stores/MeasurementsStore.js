@@ -17,11 +17,11 @@ export const useMeasurementsStore = defineStore('measurements', {
 	getters: {},
 
 	actions: {
-		async fetchMeasurementsData(measurementId) {
+		async fetchMeasurementsData(measurement_id) {
 			try {
 				const token = localStorage.getItem('token');
 				const response = await axios.get(
-					`${config.backendUrl}/measurements/${measurementId}`,
+					`${config.backendUrl}/measurements/${measurement_id}`,
 					{
 						headers: {
 							Authorization: 'Bearer ' + token,
@@ -34,11 +34,11 @@ export const useMeasurementsStore = defineStore('measurements', {
 			}
 		},
 
-		async downloadMeasurementZip(measurementId) {
+		async downloadMeasurementZip(measurement_id) {
 			try {
 				const token = localStorage.getItem('token');
 				const response = await axios.get(
-					`${config.backendUrl}/measurements/${measurementId}`,
+					`${config.backendUrl}/measurements/${measurement_id}`,
 					{
 						responseType: 'blob',
 						headers: {
@@ -55,8 +55,9 @@ export const useMeasurementsStore = defineStore('measurements', {
 		async fetchManualMeasurementConfig() {
 			try {
 				const token = localStorage.getItem('token');
-				const response = await axios.get(
+				const response = await axios.post(
 					`${config.backendUrl}/measurements/start`,
+					{},
 					{
 						headers: {
 							Authorization: 'Bearer ' + token,
@@ -84,10 +85,10 @@ export const useMeasurementsStore = defineStore('measurements', {
 				);
 				this.measurementInfo = {
 					...this.measurementInfo,
-					lastBackup: response.data.lastBackup,
-					lastMeasurement: response.data.lastMeasurement,
-					plannedMeasurement: response.data.plannedMeasurement,
-					latestMeasurement: response.data.latestMeasurement,
+					lastBackup: response.data.last_backup,
+					lastMeasurement: response.data.last_measurement,
+					plannedMeasurement: response.data.planned_measurement,
+					latestMeasurement: response.data.latest_measurement,
 				};
 				this.error = null;
 			} catch (error) {
@@ -95,7 +96,7 @@ export const useMeasurementsStore = defineStore('measurements', {
 			}
 		},
 
-		async fetchMeasurementHistory(startDate, endDate) {
+		async fetchMeasurementHistory(start_date, end_date) {
 			try {
 				const token = localStorage.getItem('token');
 				const response = await axios.get(
@@ -104,12 +105,12 @@ export const useMeasurementsStore = defineStore('measurements', {
 						headers: {
 							Authorization: 'Bearer ' + token,
 						},
-						params: { startDate, endDate },
+						params: { start_date, end_date },
 					}
 				);
 				this.measurementHistory = response.data;
 				this.error = null;
-				await this.downloadMeasurementZip(1);
+				// await this.downloadMeasurementZip(1);
 			} catch (error) {
 				this.error = 'Cannot get measurement history ' + error;
 			}
@@ -119,7 +120,7 @@ export const useMeasurementsStore = defineStore('measurements', {
 			try {
 				const token = localStorage.getItem('token');
 				const response = await axios.get(
-					`${config.backendUrl}/settings/measurementConfig`,
+					`${config.backendUrl}/settings/measurement-config`,
 					{
 						headers: {
 							Authorization: 'Bearer ' + token,
@@ -137,7 +138,7 @@ export const useMeasurementsStore = defineStore('measurements', {
 			try {
 				const token = localStorage.getItem('token');
 				const response = await axios.put(
-					`${config.backendUrl}/settings/measurementConfig`,
+					`${config.backendUrl}/settings/measurement-config`,
 					data,
 					{
 						headers: {

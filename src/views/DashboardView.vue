@@ -10,7 +10,7 @@
 			<v-container>
 				<v-row>
 					<v-col>
-						<div class="tw-text-2xl">Dobré ráno, {{ first_name }}.</div>
+						<div class="tw-text-2xl">Dobrý den, {{ first_name }}.</div>
 					</v-col>
 				</v-row>
 				<v-row align="start" justify="start">
@@ -33,7 +33,7 @@
 						<v-card class="pa-4">
 							<v-row class="tw-flex tw-justify-between tw-items-center">
 								<v-col>
-									<v-card-title class="tw-pl-1">Nové měření</v-card-title>
+									<v-card-title class="tw-pl-1">Manuální měření</v-card-title>
 									<v-card-text
 										@click="toggleSettings"
 										class="tw-cursor-pointer tw-pl-1"
@@ -101,11 +101,11 @@
 							</thead>
 							<tbody>
 								<tr v-for="item in displayedMeasurements" :key="item.name">
-									<td>{{ item.dateTime }}</td>
-									<td>{{ item.numberOfSensors }}</td>
-									<td>{{ item.lengthOfAE }}</td>
-									<td>{{ item.rgbCamera ? 'Ano' : 'Ne' }}</td>
-									<td>{{ item.multispectralCamera ? 'Ano' : 'Ne' }}</td>
+									<td>{{ formatDateMinutes(item.date_time) }}</td>
+									<td>{{ item.number_of_sensors }}</td>
+									<td>{{ item.length_of_ae }}</td>
+									<td>{{ item.rgb_camera ? 'Ano' : 'Ne' }}</td>
+									<td>{{ item.multispectral_camera ? 'Ano' : 'Ne' }}</td>
 									<td>{{ item.scheduled ? 'Ano' : 'Ne' }}</td>
 									<td>
 										<PrimaryButton
@@ -141,27 +141,25 @@ const loading = ref(true);
 const measurements = computed(() => store.measurementInfo.latestMeasurement);
 const measurementsConfig = computed(() => store.measurementConfig);
 
-const multispectralCameraChecked = ref(
-	measurementsConfig.value.multispectralCamera,
-);
-const measurementDuration = ref(measurementsConfig.value.lengthOfAE);
-const rgbCameraChecked = ref(measurementsConfig.value.rgbCamera);
-const selectedSensorCount = ref(measurementsConfig.value.numberOfSensors);
+const multispectralCameraChecked = ref(measurementsConfig.value.multispectral_camera);
+const measurementDuration = ref(measurementsConfig.value.length_of_ae);
+const rgbCameraChecked = ref(measurementsConfig.value.rgb_camera);
+const selectedSensorCount = ref(measurementsConfig.value.number_of_sensors);
 const rgbCameraSensors = ref([1, 2, 3, 4, 5, 6]);
 const first_name = ref(sessionStorage.getItem('first_name'));
 const loadingButton = ref(false);
 
 onMounted(async () => {
-	store.fetchLatestMeasurements();
+	await store.fetchLatestMeasurements();
 
 	loading.value = true;
 	await store.fetchMeasurementConfig();
 
-	measurementDuration.value = store.measurementConfig.lengthOfAE;
+	measurementDuration.value = store.measurementConfig.length_of_ae;
 	multispectralCameraChecked.value =
-		store.measurementConfig.multispectralCamera;
-	rgbCameraChecked.value = store.measurementConfig.rgbCamera;
-	selectedSensorCount.value = store.measurementConfig.numberOfSensors;
+		store.measurementConfig.multispectral_camera;
+	rgbCameraChecked.value = store.measurementConfig.rgb_camera;
+	selectedSensorCount.value = store.measurementConfig.number_of_sensors;
 	loading.value = false;
 });
 
@@ -182,14 +180,15 @@ function updateConfig() {
 	try {
 		const currentTime = moment().local().toISOString();
 		const data = {
-			measurementFrequency: 60,
-			firstMeasurement: currentTime,
-			rgbCamera: rgbCameraChecked.value,
-			multispectralCamera: multispectralCameraChecked.value,
-			numberOfSensors: selectedSensorCount.value,
-			lengthOfAE: measurementDuration.value,
+			measurement_frequency: 60,
+			first_measurement: currentTime,
+			rgb_camera: rgbCameraChecked.value,
+			multispectral_camera: multispectralCameraChecked.value,
+			number_of_sensors: selectedSensorCount.value,
+			length_of_ae: measurementDuration.value,
 		};
-		store.updateMeasurementConfig(data);
+		// Turned off for debugging...
+		// TODO: store.updateMeasurementConfig(data);
 
 		store.fetchManualMeasurementConfig().then(() => {
 			console.log('Manual measurement ended');
@@ -250,7 +249,9 @@ const downloadData = async (item) => {
 };
 
 const displayedMeasurements = computed(() => {
-	return measurements.value.slice(0, 5).map((item) => ({
+	const data = measurements.value;
+	if (!Array.isArray(data)) return [];
+	return data.slice(0, 5).map((item) => ({
 		...item,
 		dateTime: formatDateMinutes(item.dateTime),
 	}));
