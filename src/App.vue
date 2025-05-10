@@ -1,31 +1,31 @@
 <template>
-    <v-app>
-        <Sidebar v-if="!isLoginRoute" />
-        <v-main>
-            <v-container>
-                <router-view />
-            </v-container>
-        </v-main>
-    </v-app>
+  <v-app>
+    <Sidebar v-if="!isLoginRoute" />
+    <v-main>
+      <v-container>
+        <router-view />
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup>
-import { Icon } from '@iconify/vue';
-import Sidebar from '@/components/Sidebar.vue';
-import { useUserStore } from './stores/UserStore';
-import { useRouter } from 'vue-router';
-import { computed } from 'vue';
+  import { Icon } from '@iconify/vue';
+  import Sidebar from '@/components/Sidebar.vue';
+  import { useUserStore } from './stores/UserStore';
+  import { useRouter } from 'vue-router';
+  import { computed } from 'vue';
 
-const router = useRouter();
+  const router = useRouter();
 
-const isLoginRoute = computed(() => router.currentRoute.value.name === 'login');
+  const isLoginRoute = computed(() => router.currentRoute.value.name === 'login');
 
-defineExpose({ Sidebar, Icon, isLoginRoute });
+  defineExpose({ Sidebar, Icon, isLoginRoute });
 
-const userStore = useUserStore();
-userStore.initializeToken();
+  const userStore = useUserStore();
+  userStore.initializeToken();
 
-/*
+  /*
 const userStore = useUserStore();
 
 const router = useRouter();
@@ -44,10 +44,10 @@ defineExpose({ login, logout });
 </script>
 
 <style>
-nav {
-	margin-bottom: 1em;
-}
-.v-main {
-    padding-top: 1rem; 
-}
+  nav {
+    margin-bottom: 1em;
+  }
+  .v-main {
+    padding-top: 1rem;
+  }
 </style>

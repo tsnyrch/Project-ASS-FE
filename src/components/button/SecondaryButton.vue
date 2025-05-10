@@ -1,29 +1,28 @@
 <template>
-	<v-btn @click="onClick" :class="buttonClass" :size="size">
-		<template v-if="icon">
-			<v-icon>{{ icon }}</v-icon>
-		</template>
-		{{ text }}
-	</v-btn>
+  <v-btn @click="onClick" :class="buttonClass" :size="size">
+    <template v-if="icon">
+      <v-icon>{{ icon }}</v-icon>
+    </template>
+    {{ text }}
+  </v-btn>
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+  import { defineProps, defineEmits } from 'vue';
 
-const props = defineProps({
-	text: String,
-	icon: String,
-	size: String,
-});
+  const props = defineProps({
+    text: String,
+    icon: String,
+    size: String
+  });
 
-const emit = defineEmits(['click']);
+  const emit = defineEmits(['click']);
 
-const buttonClass =
-	'tw-bg-light-grey tw-rounded-xl tw-text-black tw-normal-case';
+  const buttonClass = 'tw-bg-light-grey tw-rounded-xl tw-text-black tw-normal-case';
 
-const onClick = () => {
-	emit('click');
-};
+  const onClick = () => {
+    emit('click');
+  };
 </script>
 
 <style scoped></style>

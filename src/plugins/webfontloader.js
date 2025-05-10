@@ -5,13 +5,11 @@
  */
 
 export async function loadFonts() {
-	const webFontLoader = await import(
-		/* webpackChunkName: "webfontloader" */ 'webfontloader'
-	);
+  const webFontLoader = await import(/* webpackChunkName: "webfontloader" */ 'webfontloader');
 
-	webFontLoader.load({
-		google: {
-			families: ['Be Vietnam Pro:300,400,500,600,700,800,900'],
-		},
-	});
+  webFontLoader.load({
+    google: {
+      families: ['Be Vietnam Pro:300,400,500,600,700,800,900']
+    }
+  });
 }
