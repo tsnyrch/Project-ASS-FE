@@ -1,6 +1,5 @@
 <template>
-	<v-app>
-		<v-main>
+
 			<v-container>
 				<v-row>
 					<v-col>
@@ -37,50 +36,52 @@
 					</v-col>
 				</v-row>
 
-				<v-row>
-					<v-col>
-						<v-text-field
-							v-model="firstName"
-							label="Zadejte jméno"
-							density="compact"
-							variant="outlined"
-							clearable
-							:error-messages="firstNameError ? ['Neplatné jméno'] : []"
-							@blur="validateFirstName"
-							@click:clear="clearFirstNameError"
-						></v-text-field>
-					</v-col>
-					<v-col>
-						<v-text-field
-							v-model="lastName"
-							label="Zadejte příjmení"
-							density="compact"
-							variant="outlined"
-							clearable
-							:error-messages="lastNameError ? ['Neplatné příjmení'] : []"
-							@blur="validateLastName"
-							@click:clear="clearLastNameError"
-						></v-text-field>
-					</v-col>
-					<v-col>
-						<v-text-field
-							v-model="userName"
-							label="Zadejte uživatelské jméno"
-							density="compact"
-							variant="outlined"
-							clearable
-							:error-messages="userNameError ? ['Neplatné uživatelské jméno'] : []"
-							@blur="validateUserName"
-							@click:clear="clearUserNameError"
-						></v-text-field>
-					</v-col>
-					<v-col>
-						<PrimaryButton @click="addUser" text="Přidat uživatele" />
-					</v-col>
-				</v-row>
+				             <v-row>
+                    <v-col>
+                        <v-text-field
+                            v-model="firstName"
+                            label="Zadejte jméno"
+                            density="compact"
+                            variant="outlined"
+                            clearable
+                            :error-messages="errors.firstName ? [errors.firstName] : []"
+                            @blur="() => validateField('firstName', firstName, 'jméno')"
+                            @click:clear="() => { firstName = ''; clearFieldError('firstName'); }"
+                            @update:modelValue="() => clearFieldError('firstName')"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col>
+                        <v-text-field
+                            v-model="lastName"
+                            label="Zadejte příjmení"
+                            density="compact"
+                            variant="outlined"
+                            clearable
+                            :error-messages="errors.lastName ? [errors.lastName] : []"
+                            @blur="() => validateField('lastName', lastName, 'příjmení')"
+                            @click:clear="() => { lastName = ''; clearFieldError('lastName'); }"
+                            @update:modelValue="() => clearFieldError('lastName')"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col>
+                        <v-text-field
+                            v-model="userName"
+                            label="Zadejte uživatelské jméno"
+                            density="compact"
+                            variant="outlined"
+                            clearable
+                            :error-messages="errors.userName ? [errors.userName] : []"
+                            @blur="() => validateField('userName', userName, 'uživatelské jméno')"
+                            @click:clear="() => { userName = ''; clearFieldError('userName'); }"
+                            @update:modelValue="() => clearFieldError('userName')"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col>
+                        <PrimaryButton @click="addUser" text="Přidat uživatele" />
+                    </v-col>
+                </v-row>
 			</v-container>
-		</v-main>
-	</v-app>
+	
 </template>
 
 <script setup>
@@ -99,55 +100,64 @@ const users = computed(() => store.users);
 const firstName = ref('');
 const lastName = ref('');
 const userName = ref('');
-const firstNameError = ref(false);
-const lastNameError = ref(false);
-const userNameError = ref(false);
 
-// Validation function
-const validate = (refValue, errorRef) => {
-	errorRef.value = refValue.value.trim() === '';
+
+const errors = ref({
+    firstName: '',
+    lastName: '',
+    userName: '',
+});
+
+
+const validateField = (field, value, fieldName) => {
+    if (String(value).trim() === '') {
+        errors.value[field] = `Neplatné ${fieldName}`;
+        return false;
+    }
+    errors.value[field] = '';
+    return true;
 };
 
-const clearError = (errorRef) => {
-	errorRef.value = false;
+const validateAllFields = () => {
+
+    const isFirstNameValid = validateField('firstName', firstName.value, 'jméno');
+    const isLastNameValid = validateField('lastName', lastName.value, 'příjmení');
+    const isUserNameValid = validateField('userName', userName.value, 'uživatelské jméno');
+    return isFirstNameValid && isLastNameValid && isUserNameValid;
 };
 
-// Wrappers for use in template
-const validateFirstName = () => validate(firstName, firstNameError);
-const validateLastName = () => validate(lastName, lastNameError);
-const validateUserName = () => validate(userName, userNameError);
+const clearFieldError = (field) => {
+    errors.value[field] = '';
+};
 
-const clearFirstNameError = () => clearError(firstNameError);
-const clearLastNameError = () => clearError(lastNameError);
-const clearUserNameError = () => clearError(userNameError);
 
-// Add user logic
-function addUser() {
-	validateFirstName();
-	validateLastName();
-	validateUserName();
+async function addUser() {
+    if (!validateAllFields()) {
+        return;
+    }
 
-	if (firstNameError.value || lastNameError.value || userNameError.value) {
-		return;
-	}
+    const data = {
+        first_name: firstName.value,
+        last_name: lastName.value,
+        user_name: userName.value,
+        password: 'admin123', 
+        isAdmin: false,
+    };
 
-	const data = {
-		first_name: firstName.value,
-		last_name: lastName.value,
-		user_name: userName.value,
-		password: 'admin123',
-		isAdmin: false,
-	};
+    try {
+        await store.addUser(data); 
 
-	try {
-		store.addUser(data);
-		// Clear inputs
-		firstName.value = '';
-		lastName.value = '';
-		userName.value = '';
-	} catch (error) {
-		store.error = error.message;
-	}
+        firstName.value = '';
+        lastName.value = '';
+        userName.value = '';
+
+        Object.keys(errors.value).forEach(key => errors.value[key] = '');
+    } catch (error) {
+        store.error = error.message;
+ 
+        console.error("Failed to add user:", error);
+
+    }
 }
 </script>
 

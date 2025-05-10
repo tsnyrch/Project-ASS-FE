@@ -1,6 +1,5 @@
 <template>
-	<v-app>
-		<v-main>
+
 			<error
 				v-if="store.error"
 				:text="store.error"
@@ -120,8 +119,7 @@
 					</v-col>
 				</v-row>
 			</v-container>
-		</v-main>
-	</v-app>
+
 </template>
 
 <script setup>

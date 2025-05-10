@@ -1,6 +1,5 @@
 <template>
-	<v-app>
-		<v-main>
+
 			<v-container>
 				<v-row>
 					<v-col>
@@ -61,8 +60,7 @@
 				/>
 			</v-container>
 			<PrimaryButton text="Uložit nastavení" @click="updateConfig()" />
-		</v-main>
-	</v-app>
+	
 </template>
 
 <script setup>

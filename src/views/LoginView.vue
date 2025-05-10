@@ -12,7 +12,7 @@
 					/>
 					<div class="tw-text-2xl tw-font-bold">Vítejte zpět</div>
 					<div class="tw-text-xl tw-text-gray-500 tw-mb-8">
-						Systém pro výzkum akustických emisí
+						Systém pro výzkum akustických emisí		
 					</div>
 
 					<v-form v-model="form" @submit.prevent="onSubmit">
