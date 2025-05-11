@@ -36,8 +36,6 @@ export const useUserStore = defineStore('user', {
         // extract user information from JWT token
         const user = JSON.parse(atob(this.token.split('.')[1]));
 
-        console.log('Login successful:', response.data);
-
         sessionStorage.setItem('first_name', user.first_name || '');
         sessionStorage.setItem('last_name', user.last_name || '');
 
@@ -56,11 +54,54 @@ export const useUserStore = defineStore('user', {
         this.token = token;
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
         this.isLoggedIn = true;
+
+        // Setup response interceptor for 401 errors
+        this.setupAuthInterceptor();
       }
     },
 
     // Clear auth and token
-    logout() {
+    async logout() {
+      this.token = null;
+      delete axios.defaults.headers.common['Authorization'];
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('first_name');
+      sessionStorage.removeItem('last_name');
+      this.isLoggedIn = false;
+    },
+
+    // Setup axios interceptor to catch 401 errors
+    setupAuthInterceptor() {
+      // Remove existing interceptors if any
+      if (axios.interceptors && this.interceptorId) {
+        axios.interceptors.response.eject(this.interceptorId);
+      }
+
+      // Add a response interceptor
+      this.interceptorId = axios.interceptors.response.use(
+        (response) => response,
+        async (error) => {
+          if (error.response && error.response.status === 401) {
+            // Logout user
+            await this.logout();
+
+            // Redirect to login page
+            // Use router.push to avoid circular dependency
+            if (router.currentRoute.value.name !== 'login') {
+              router.push({ name: 'login' });
+            }
+
+            // Show message to user
+            this.error = 'Vaše přihlášení vypršelo. Prosím, přihlaste se znovu.';
+          }
+
+          return Promise.reject(error);
+        }
+      );
+    },
+
+    // Clear auth and token
+    async logout() {
       this.token = null;
       delete axios.defaults.headers.common['Authorization'];
       localStorage.removeItem('token');

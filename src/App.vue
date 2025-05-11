@@ -2,9 +2,7 @@
   <v-app>
     <Sidebar v-if="!isLoginRoute" />
     <v-main>
-      <v-container>
-        <router-view />
-      </v-container>
+      <router-view />
     </v-main>
   </v-app>
 </template>

@@ -18,13 +18,13 @@
 
     <v-row>
       <v-col>
-        <v-card class="pa-4">
+        <v-card class="tw-py-5 tw-px-6 tw-shadow-sm tw-rounded-xl tw-bg-gradient-to-r tw-from-white tw-to-light-grey/10 tw-border tw-border-gray-100">
           <v-row class="tw-flex tw-justify-between tw-items-center">
             <v-col>
-              <v-card-title class="tw-pl-1">Manuální měření</v-card-title>
-              <v-card-text @click="toggleSettings" class="tw-cursor-pointer tw-pl-1">
+              <v-card-title class="tw-pl-1 tw-font-semibold">Manuální měření</v-card-title>
+              <v-card-text @click="toggleSettings" class="tw-cursor-pointer tw-pl-1 tw-flex tw-items-center tw-text-mendelu-green">
                 {{ showSettings ? 'Zobrazit méně' : 'Upravit nastavení' }}
-                <v-icon>{{ showSettings ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+                <v-icon class="tw-ml-1">{{ showSettings ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
               </v-card-text>
             </v-col>
 
@@ -56,34 +56,35 @@
 
     <v-row>
       <v-col>
-        <v-data-table :headers="headers" :items="measurements" title="Poslední měření" class="elevation-1">
-          <template v-slot:top>
-            <v-toolbar flat dense class="tw-bg-white">
-              <v-toolbar-title>Poslední měření</v-toolbar-title>
-            </v-toolbar>
-          </template>
-          <thead>
-            <tr>
-              <th v-for="header in headers" :key="header.text">
-                {{ header.text }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in displayedMeasurements" :key="item.name">
-              <td>{{ formatDateMinutes(item.date_time) }}</td>
-              <td>{{ item.number_of_sensors }}</td>
-              <td>{{ item.length_of_ae }}</td>
-              <td>{{ item.rgb_camera ? 'Ano' : 'Ne' }}</td>
-              <td>{{ item.multispectral_camera ? 'Ano' : 'Ne' }}</td>
-              <td>{{ item.scheduled ? 'Ano' : 'Ne' }}</td>
-              <td>
-                <PrimaryButton text="Stáhnout" @click="downloadData(item.id)" />
-              </td>
-            </tr>
-          </tbody>
-          <template v-slot:bottom></template>
-        </v-data-table>
+        <v-card class="tw-rounded-xl tw-overflow-hidden tw-border tw-border-gray-100 tw-shadow-sm tw-mb-6">
+          <v-data-table :headers="headers" :items="displayedMeasurements" :items-per-page="5" hide-default-footer class="tw-bg-white" item-value="id">
+            <template v-slot:top>
+              <v-toolbar flat dense class="tw-bg-white tw-border-b tw-border-gray-100">
+                <v-toolbar-title class="tw-font-medium tw-text-gray-800">Poslední měření</v-toolbar-title>
+              </v-toolbar>
+            </template>
+
+            <template v-slot:item.date_time="{ item }">
+              {{ formatDateMinutes(item.date_time || item.columns?.date_time || item.raw?.date_time) }}
+            </template>
+
+            <template v-slot:item.rgb_camera="{ item }">
+              {{ item.rgb_camera || item.columns?.rgb_camera || item.raw?.rgb_camera ? 'Ano' : 'Ne' }}
+            </template>
+
+            <template v-slot:item.multispectral_camera="{ item }">
+              {{ item.multispectral_camera || item.columns?.multispectral_camera || item.raw?.multispectral_camera ? 'Ano' : 'Ne' }}
+            </template>
+
+            <template v-slot:item.scheduled="{ item }">
+              {{ item.scheduled || item.columns?.scheduled || item.raw?.scheduled ? 'Ano' : 'Ne' }}
+            </template>
+
+            <template v-slot:item.actions="{ item }">
+              <PrimaryButton text="Stáhnout" @click="downloadData(item.id || item.raw?.id)" />
+            </template>
+          </v-data-table>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
@@ -128,13 +129,13 @@
   });
 
   const headers = [
-    { text: 'Datum a čas', value: 'date' },
-    { text: 'Počet senzorů', value: 'sensors' },
-    { text: 'Délka AE', value: 'lengthOfAE' },
-    { text: 'RGB', value: 'rgb' },
-    { text: 'Multispektrální', value: 'multispectral' },
-    { text: 'Plánované měření', value: 'scheduled' },
-    { text: 'Stáhnout data', value: 'actions', sortable: false }
+    { title: 'Datum a čas', key: 'date_time', align: 'start' },
+    { title: 'Počet senzorů', key: 'number_of_sensors', align: 'center' },
+    { title: 'Délka AE', key: 'length_of_ae', align: 'center' },
+    { title: 'RGB', key: 'rgb_camera', align: 'center' },
+    { title: 'Multispektrální', key: 'multispectral_camera', align: 'center' },
+    { title: 'Plánované měření', key: 'scheduled', align: 'center' },
+    { title: 'Stáhnout data', key: 'actions', sortable: false, align: 'end' }
   ];
 
   const showSettings = ref(false);
@@ -155,7 +156,6 @@
       // TODO: store.updateMeasurementConfig(data);
 
       store.fetchManualMeasurementConfig().then(() => {
-        console.log('Manual measurement ended');
         loadingButton.value = false;
       });
     } catch (error) {
@@ -193,16 +193,12 @@
     a.dataset.downloadurl = ['application/zip', a.download, a.href].join(':');
     e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
     a.dispatchEvent(e);
-    console.log('Stahuji data pro', item);
   };
 
   const displayedMeasurements = computed(() => {
     const data = measurements.value;
     if (!Array.isArray(data)) return [];
-    return data.slice(0, 5).map((item) => ({
-      ...item,
-      dateTime: formatDateMinutes(item.dateTime)
-    }));
+    return data.slice(0, 5);
   });
 </script>
 

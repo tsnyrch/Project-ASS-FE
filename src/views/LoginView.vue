@@ -16,7 +16,6 @@
               :rules="[rules.required, rules.minName]"
               class="tw-mb-2 tw-w-96"
               label="Přihlašovací jméno"
-              clearable
               @input="clearErrors"
             ></v-text-field>
 
@@ -31,7 +30,7 @@
               :rules="[rules.required, rules.minPassword]"
               label="Password"
               placeholder="Zadejte heslo"
-              clearable
+              class="tw-mb-2 tw-w-96"
               @input="clearErrors"
             ></v-text-field>
 
@@ -80,7 +79,6 @@
       await router.push({ path: '/dashboard' });
     } else {
       error.value = true;
-      console.log(error.value);
     }
   };
 </script>

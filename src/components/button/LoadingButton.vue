@@ -1,5 +1,5 @@
 <template>
-  <v-btn @click="onClick" class="tw-bg-mendelu-green tw-rounded-xl tw-text-white tw-normal-case" :size="size" :disabled="loading">
+  <v-btn class="tw-bg-mendelu-green tw-rounded-xl tw-text-white tw-normal-case" :size="size" :disabled="loading">
     <template v-if="loading">
       <v-progress-circular indeterminate model-value="20" :size="20"></v-progress-circular>
       &nbsp;

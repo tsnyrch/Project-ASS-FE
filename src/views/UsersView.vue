@@ -14,13 +14,20 @@
 
     <v-row v-for="(user, index) in users" :key="index" class="ma-0">
       <v-col class="pa-0">
-        <v-card class="mx-auto tw-bg-light-grey mt-2" variant="flat">
+        <v-card
+          class="mx-auto tw-bg-white tw-shadow-sm hover:tw-shadow-md tw-border tw-border-gray-100 tw-rounded-lg tw-transition-all tw-duration-200 tw-mb-2"
+          elevation="0"
+        >
           <v-row>
             <v-col cols="12" sm="4">
-              <v-card-title class="d-flex justify-start align-center text-center text-body-1">
-                <v-icon class="pr-3">mdi-account-circle-outline</v-icon>
-                {{ user.first_name }} {{ user.last_name }}
+              <v-card-title class="d-flex justify-start align-center text-body-1">
+                <v-icon class="pr-3 tw-text-mendelu-green">mdi-account-circle-outline</v-icon>
+                <span class="tw-font-medium">{{ user.first_name }} {{ user.last_name }}</span>
               </v-card-title>
+            </v-col>
+            <v-col cols="12" sm="8" class="tw-flex tw-items-center tw-justify-end">
+              <v-chip size="small" class="tw-mr-2 tw-bg-light-grey">{{ user.user_name }}</v-chip>
+              <v-icon size="small" class="tw-text-gray-500">mdi-dots-vertical</v-icon>
             </v-col>
           </v-row>
         </v-card>

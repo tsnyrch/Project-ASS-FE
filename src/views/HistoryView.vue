@@ -8,54 +8,68 @@
     </v-row>
     <v-row>
       <v-col>
-        <DateTimePickerRange v-model:startDate="defaultStartDate" v-model:endDate="defaultEndDate" />
+        <DateTimePickerRange v-model:initialStartDate="defaultStartDate" v-model:initialEndDate="defaultEndDate" />
       </v-col>
     </v-row>
 
     <v-row>
       <v-col>
-        <v-data-table :headers="headers" class="elevation-1" title="Poslední měření">
-          <template v-slot:top>
-            <v-toolbar flat dense class="tw-bg-white">
-              <v-toolbar-title>
-                Měření mezi
-                {{ moment(defaultStartDate).format('DD.MM.YYYY HH:mm:ss') }}
-                – {{ moment(defaultEndDate).format('DD.MM.YYYY HH:mm:ss') }}
-              </v-toolbar-title>
-            </v-toolbar>
-          </template>
-          <thead>
-            <tr>
-              <th v-for="header in headers" :key="header.text">
-                {{ header.text }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in pagedMeasurements" :key="item.name">
-              <td>{{ formatDateMinutes(item.date_time) }}</td>
-              <td>{{ item.number_of_sensors }}</td>
-              <td>{{ item.length_of_ae }}</td>
-              <td>{{ item.rgb_camera ? 'Ano' : 'Ne' }}</td>
-              <td>{{ item.multispectral_camera ? 'Ano' : 'Ne' }}</td>
-              <td>{{ item.scheduled ? 'Ano' : 'Ne' }}</td>
-              <td>
-                <PrimaryButton text="Stáhnout" @click="downloadData(item.id)" />
-              </td>
-            </tr>
-          </tbody>
-          <template v-slot:bottom></template>
-        </v-data-table>
-        <div class="text-center pt-2">
-          <v-pagination
-            v-model="page"
-            :length="pageCount"
-            :total-visible="totalVisible"
-            prev-icon="mdi-chevron-left"
-            next-icon="mdi-chevron-right"
-          ></v-pagination>
-          <div class="tw-text-dark-grey tw-text-xs">{{ rangeText }}</div>
-        </div>
+        <v-card class="tw-rounded-xl tw-overflow-hidden tw-border tw-border-gray-100 tw-shadow-sm">
+          <v-data-table
+            :headers="headers"
+            :items="measurements"
+            :items-per-page="itemsPerPage"
+            :page="page"
+            :items-length="totalItems"
+            hide-default-footer
+            class="tw-bg-white"
+            item-value="id"
+            @update:page="updatePage"
+          >
+            <template v-slot:top>
+              <v-toolbar flat dense class="tw-bg-white tw-border-b tw-border-gray-100">
+                <v-toolbar-title class="tw-font-medium">
+                  Měření mezi
+                  {{ moment(defaultStartDate).format('DD.MM.YYYY HH:mm:ss') }}
+                  – {{ moment(defaultEndDate).format('DD.MM.YYYY HH:mm:ss') }}
+                </v-toolbar-title>
+              </v-toolbar>
+            </template>
+
+            <template v-slot:item.date_time="{ item }">
+              {{ formatDateMinutes(item.date_time || item.columns?.date_time || item.raw?.date_time) }}
+            </template>
+
+            <template v-slot:item.rgb_camera="{ item }">
+              {{ item.rgb_camera || item.columns?.rgb_camera || item.raw?.rgb_camera ? 'Ano' : 'Ne' }}
+            </template>
+
+            <template v-slot:item.multispectral_camera="{ item }">
+              {{ item.multispectral_camera || item.columns?.multispectral_camera || item.raw?.multispectral_camera ? 'Ano' : 'Ne' }}
+            </template>
+
+            <template v-slot:item.scheduled="{ item }">
+              {{ item.scheduled || item.columns?.scheduled || item.raw?.scheduled ? 'Ano' : 'Ne' }}
+            </template>
+
+            <template v-slot:item.actions="{ item }">
+              <PrimaryButton text="Stáhnout" @click="downloadData(item.id || item.raw?.id)" />
+            </template>
+          </v-data-table>
+
+          <div class="tw-bg-white tw-px-4 tw-py-3 tw-border-t tw-border-gray-100 tw-flex tw-justify-between tw-items-center">
+            <div class="tw-text-dark-grey tw-text-sm">{{ rangeText }}</div>
+            <v-pagination
+              v-model="page"
+              :length="pageCount"
+              :total-visible="totalVisible"
+              prev-icon="mdi-chevron-left"
+              next-icon="mdi-chevron-right"
+              rounded
+              class="tw-mb-0"
+            ></v-pagination>
+          </div>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
@@ -79,13 +93,13 @@
   const measurements = computed(() => store.measurementHistory.measurements);
 
   const headers = [
-    { text: 'Datum a čas', value: 'date' },
-    { text: 'Počet senzorů', value: 'sensors' },
-    { text: 'Délka AE', value: 'lengthOfAE' },
-    { text: 'RGB', value: 'rgb' },
-    { text: 'Multispektrální', value: 'multispectral' },
-    { text: 'Plánované měření', value: 'scheduled' },
-    { text: 'Stáhnout data', value: 'actions', sortable: false }
+    { title: 'Datum a čas', key: 'date_time', align: 'start' },
+    { title: 'Počet senzorů', key: 'number_of_sensors', align: 'center' },
+    { title: 'Délka AE', key: 'length_of_ae', align: 'center' },
+    { title: 'RGB', key: 'rgb_camera', align: 'center' },
+    { title: 'Multispektrální', key: 'multispectral_camera', align: 'center' },
+    { title: 'Plánované měření', key: 'scheduled', align: 'center' },
+    { title: 'Stáhnout data', key: 'actions', sortable: false, align: 'end' }
   ];
 
   const page = ref(1);
@@ -95,11 +109,9 @@
   const totalItems = computed(() => measurements.value?.length ?? 0);
   const pageCount = computed(() => Math.ceil(totalItems.value / itemsPerPage));
 
-  const pagedMeasurements = computed(() => {
-    const all = Array.isArray(measurements.value) ? measurements.value : [];
-    const startIndex = (page.value - 1) * itemsPerPage;
-    return all.slice(startIndex, startIndex + itemsPerPage);
-  });
+  function updatePage(newPage) {
+    page.value = newPage;
+  }
 
   const rangeText = computed(() => {
     const startIndex = (page.value - 1) * itemsPerPage + 1;
@@ -135,7 +147,6 @@
     a.dataset.downloadurl = ['application/zip', a.download, a.href].join(':');
     e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
     a.dispatchEvent(e);
-    console.log('Stahuji data pro', item);
   };
 </script>
 
