@@ -7,12 +7,23 @@ import vuetify from './plugins/vuetify';
 import { loadFonts } from './plugins/webfontloader';
 import './style.css';
 
-loadFonts().then(() => {});
+loadFonts()
+  .then(() => {
+    const app = createApp(App);
+    const pinia = createPinia();
+    app.use(pinia);
+    const userStore = useUserStore();
+    userStore.initializeToken();
 
-const app = createApp(App);
-const pinia = createPinia();
-app.use(pinia);
-
-const userStore = useUserStore();
-userStore.initializeToken();
-app.use(router).use(vuetify).mount('#app');
+    app.use(router);
+    app.use(vuetify);
+    app.mount('#app');
+  })
+  .catch((error) => {
+    const app = createApp(App);
+    const pinia = createPinia();
+    app.use(pinia);
+    const userStore = useUserStore();
+    userStore.initializeToken();
+    app.use(router).use(vuetify).mount('#app');
+  });

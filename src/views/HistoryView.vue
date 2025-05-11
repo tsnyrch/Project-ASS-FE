@@ -8,7 +8,12 @@
     </v-row>
     <v-row>
       <v-col>
-        <DateTimePickerRange v-model:initialStartDate="defaultStartDate" v-model:initialEndDate="defaultEndDate" />
+        <DateTimePickerRange
+          :initialStartDate="defaultStartDate"
+          :initialEndDate="defaultEndDate"
+          @update:startDate="(newVal) => (defaultStartDate = newVal)"
+          @update:endDate="(newVal) => (defaultEndDate = newVal)"
+        />
       </v-col>
     </v-row>
 
@@ -86,8 +91,15 @@
 
   const store = useMeasurementsStore();
 
-  onMounted(() => {
-    store.fetchMeasurementHistory(defaultStartDate.value, defaultEndDate.value);
+  const defaultStartDate = ref(new Date());
+  defaultStartDate.value.setDate(defaultStartDate.value.getDate() - 7);
+
+  const defaultEndDate = ref(new Date());
+
+  onMounted(async () => {
+    const formattedStartDate = moment(defaultStartDate.value).toISOString();
+    const formattedEndDate = moment(defaultEndDate.value).toISOString();
+    await store.fetchMeasurementHistory(formattedStartDate, formattedEndDate);
   });
 
   const measurements = computed(() => store.measurementHistory.measurements);
@@ -119,27 +131,31 @@
     return `${startIndex}-${endIndex} z ${totalItems.value}`;
   });
 
-  // start date is 7 days ago
-  const defaultStartDate = ref(new Date());
-  defaultStartDate.value.setDate(defaultStartDate.value.getDate() - 7);
+  watch(
+    [defaultStartDate, defaultEndDate],
+    async (newValues, oldValues) => {
+      if (newValues[0] === oldValues[0] && newValues[1] === oldValues[1]) {
+        return;
+      }
 
-  // end date is now
-  const defaultEndDate = ref(new Date());
+      const startDate = newValues[0];
+      const endDate = newValues[1];
 
-  watch([defaultStartDate, defaultEndDate], () => {
-    const formattedStartDate = moment(defaultStartDate.value, 'DD.MM.YYYY HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss');
-    const formattedEndDate = moment(defaultEndDate.value, 'DD.MM.YYYY HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss');
+      if (!(startDate instanceof Date) || !(endDate instanceof Date) || isNaN(startDate) || isNaN(endDate)) {
+        console.error('Invalid date objects in watcher:', startDate, endDate);
+        return;
+      }
 
-    if (formattedStartDate !== 'Invalid date' && formattedEndDate !== 'Invalid date') {
-      store.fetchMeasurementHistory(formattedStartDate, formattedEndDate);
-    } else {
-      console.error('Invalid history date range:', formattedStartDate, '–', formattedEndDate);
-    }
-  });
+      const formattedStartDate = moment(startDate).toISOString();
+      const formattedEndDate = moment(endDate).toISOString();
 
-  const downloadData = async (item) => {
-    const data = JSON.stringify(item);
-    const blob = await store.downloadMeasurementZip(item);
+      await store.fetchMeasurementHistory(formattedStartDate, formattedEndDate);
+    },
+    { deep: true }
+  );
+
+  const downloadData = async (itemId) => {
+    const blob = await store.downloadMeasurementZip(itemId);
     const e = document.createEvent('MouseEvents'),
       a = document.createElement('a');
     a.download = Date.now().toString() + '.zip';
