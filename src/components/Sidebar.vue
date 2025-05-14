@@ -2,7 +2,7 @@
   <v-card class="tw-shadow-lg tw-border-r tw-border-gray-100" elevation="0">
     <v-navigation-drawer :rail="isSmallScreen" permanent class="tw-bg-white">
       <v-list-item-media class="tw-flex tw-justify-center tw-py-4 tw-border-b tw-border-gray-100">
-        <img v-if="!isSmallScreen" src="@/assets/logo.jpg" alt="Logo" class="logo-default" height="64px" />
+        <img v-if="!isSmallScreen" src="@/assets/logo.jpg" alt="Logo" class="logo-default" style="max-height: 150px !important" />
         <img v-else src="@/assets/logo_mini.png" alt="Logo" class="logo-small" />
       </v-list-item-media>
       <v-list class="tw-py-4">
@@ -14,7 +14,7 @@
           :to="item.to"
           :class="[
             'tw-mb-1 tw-transition-all tw-duration-200',
-            isSmallScreen ? 'tw-px-2 sidebar-item-small' : 'hover:tw-bg-light-grey/50 tw-rounded-lg tw-mx-2'
+            isSmallScreen ? 'sidebar-item-small' : 'hover:tw-bg-light-grey/50 tw-rounded-lg tw-mx-2'
           ]"
         ></v-list-item>
       </v-list>

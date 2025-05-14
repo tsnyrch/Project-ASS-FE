@@ -1,14 +1,14 @@
 <template>
-  <v-container>
+  <v-container style="max-width: 1280px;">
     <v-row>
       <v-col>
-        <div class="tw-text-2xl">Uživatelé</div>
+        <div class="tw-text-2xl tw-mt-4">Uživatelé</div>
       </v-col>
     </v-row>
 
     <v-row>
       <v-col>
-        <div class="tw-text-xl mb-2">Seznam uživatelů</div>
+        <div class="tw-text-xl tw-font-medium tw-mb-4">Seznam uživatelů</div>
       </v-col>
     </v-row>
 
@@ -18,14 +18,14 @@
           class="mx-auto tw-bg-white tw-shadow-sm hover:tw-shadow-md tw-border tw-border-gray-100 tw-rounded-lg tw-transition-all tw-duration-200 tw-mb-2"
           elevation="0"
         >
-          <v-row>
-            <v-col cols="12" sm="4">
+          <v-row class="pa-1">
+            <v-col cols="12" sm="8">
               <v-card-title class="d-flex justify-start align-center text-body-1">
                 <v-icon class="pr-3 tw-text-mendelu-green">mdi-account-circle-outline</v-icon>
                 <span class="tw-font-medium">{{ user.first_name }} {{ user.last_name }}</span>
               </v-card-title>
             </v-col>
-            <v-col cols="12" sm="8" class="tw-flex tw-items-center tw-justify-end">
+            <v-col cols="12" sm="4" class="tw-flex tw-items-center tw-justify-end">
               <v-chip size="small" class="tw-mr-2 tw-bg-light-grey">{{ user.user_name }}</v-chip>
               <v-icon size="small" class="tw-text-gray-500">mdi-dots-vertical</v-icon>
             </v-col>
@@ -36,17 +36,17 @@
 
     <v-row>
       <v-col>
-        <div class="tw-text-xl">Přidat nového uživatele</div>
+        <div class="tw-text-xl tw-font-medium">Přidat nového uživatele</div>
       </v-col>
     </v-row>
 
-    <v-row>
-      <v-col>
+    <v-row align-content="center">
+      <v-col cols="12" lg="3" class="pb-0">
         <v-text-field
           v-model="firstName"
-          label="Zadejte jméno"
-          density="compact"
+          label="Jméno"
           variant="outlined"
+					density="comfortable"
           clearable
           :error-messages="errors.firstName ? [errors.firstName] : []"
           @blur="() => validateField('firstName', firstName, 'jméno')"
@@ -59,12 +59,12 @@
           @update:modelValue="() => clearFieldError('firstName')"
         ></v-text-field>
       </v-col>
-      <v-col>
+      <v-col cols="12" lg="3" class="pb-0">
         <v-text-field
           v-model="lastName"
-          label="Zadejte příjmení"
-          density="compact"
+          label="Příjmení"
           variant="outlined"
+					density="comfortable"
           clearable
           :error-messages="errors.lastName ? [errors.lastName] : []"
           @blur="() => validateField('lastName', lastName, 'příjmení')"
@@ -77,12 +77,12 @@
           @update:modelValue="() => clearFieldError('lastName')"
         ></v-text-field>
       </v-col>
-      <v-col>
+      <v-col cols="12" lg="3" class="pb-0">
         <v-text-field
           v-model="userName"
-          label="Zadejte uživatelské jméno"
-          density="compact"
+          label="Uživatelské jméno"
           variant="outlined"
+					density="comfortable"
           clearable
           :error-messages="errors.userName ? [errors.userName] : []"
           @blur="() => validateField('userName', userName, 'uživatelské jméno')"
@@ -95,8 +95,9 @@
           @update:modelValue="() => clearFieldError('userName')"
         ></v-text-field>
       </v-col>
-      <v-col>
-        <PrimaryButton @click="addUser" text="Přidat uživatele" />
+      <v-col cols="12" lg="3" class="pb-0 d-flex justify-end">
+				<v-spacer></v-spacer>
+        <PrimaryButton class="min-width: max-content;" size="large" @click="addUser" text="Přidat uživatele" />
       </v-col>
     </v-row>
   </v-container>

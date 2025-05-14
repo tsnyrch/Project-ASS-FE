@@ -1,28 +1,28 @@
 <template>
-  <v-container>
+  <v-container style="max-width: 1280px;">
     <v-row>
       <v-col>
-        <div class="tw-text-2xl tw-font-semibold tw-mb-6">Nastavení měření</div>
+        <div class="tw-text-2xl tw-mt-4 tw-mb-2">Nastavení měření</div>
       </v-col>
     </v-row>
 
     <v-row align="start" justify="start" class="tw-mb-6">
-      <v-col cols="12" md="auto">
+      <v-col cols="12" sm="auto">
         <MeasurementWidget title="Poslední měření" :datetime="store.measurementInfo.lastMeasurement" />
       </v-col>
-      <v-col cols="12" md="auto">
+      <v-col cols="12" sm="auto">
         <MeasurementWidget title="Plánované měření" :datetime="store.measurementInfo.plannedMeasurement" />
       </v-col>
     </v-row>
 
-    <v-divider class="tw-my-6"></v-divider>
+		<hr class="tw-mb-8 tw-border-gray-100">
 
     <v-row>
       <v-col>
-        <div class="tw-text-xl tw-font-medium tw-mb-4">Plán automatického měření</div>
+        <div class="tw-text-xl tw-font-medium tw-mb-2">Plán automatického měření</div>
       </v-col>
     </v-row>
-    <v-row class="tw-mb-4">
+    <v-row class="tw-mb-2">
       <v-col cols="12" md="6">
         <v-text-field
           v-model="measurementFrequency"
@@ -31,20 +31,20 @@
           label="Doba mezi dvěma měřeními (minuty)"
           placeholder="Zadejte délku v minutách"
           variant="outlined"
-          density="compact"
           hide-details="auto"
-        ></v-text-field>
+					density="comfortable"
+				></v-text-field>
       </v-col>
       <v-col cols="12" md="6">
         <DateTimePickerSingle v-model="measurementDate" label="Datum a čas prvního měření" />
       </v-col>
     </v-row>
 
-    <v-divider class="tw-my-6"></v-divider>
+		<hr class="tw-mb-8 tw-border-gray-100">
 
-    <v-row>
+		<v-row>
       <v-col>
-        <div class="tw-text-xl tw-font-medium tw-mb-4">Parametry měření</div>
+        <div class="tw-text-xl tw-font-medium">Parametry měření</div>
       </v-col>
     </v-row>
     <v-row class="tw-mb-6">
@@ -103,27 +103,27 @@
     await store.fetchLatestMeasurements();
     await store.fetchMeasurementConfig();
 
-    measurementDuration.value = store.measurementConfig.lengthOfAE;
-    multispectralCameraChecked.value = store.measurementConfig.multispectralCamera;
-    rgbCameraChecked.value = store.measurementConfig.rgbCamera;
-    selectedSensorCount.value = store.measurementConfig.numberOfSensors;
-    measurementFrequency.value = store.measurementConfig.measurementFrequency;
-    measurementDate.value = store.measurementConfig.firstMeasurement ? new Date(store.measurementConfig.firstMeasurement) : new Date();
+    measurementDuration.value = store.measurementConfig.length_of_ae;
+    multispectralCameraChecked.value = store.measurementConfig.multispectral_camera;
+    rgbCameraChecked.value = store.measurementConfig.rgb_camera;
+    selectedSensorCount.value = store.measurementConfig.number_of_sensors;
+    measurementFrequency.value = store.measurementConfig.measurement_frequency;
+    measurementDate.value = store.measurementConfig.first_measurement ? new Date(store.measurementConfig.first_measurement) : new Date();
     loading.value = false;
   });
 
   function updateConfig() {
     try {
       const data = {
-        measurementFrequency: Number(measurementFrequency.value),
-        firstMeasurement: measurementDate.value,
-        rgbCamera: rgbCameraChecked.value,
-        multispectralCamera: multispectralCameraChecked.value,
-        numberOfSensors: selectedSensorCount.value,
-        lengthOfAE: Number(measurementDuration.value)
+        measurement_frequency: Number(measurementFrequency.value),
+        first_measurement: measurementDate.value,
+        rgb_camera: rgbCameraChecked.value,
+        multispectral_camera: multispectralCameraChecked.value,
+        number_of_sensors: selectedSensorCount.value,
+        length_of_ae: Number(measurementDuration.value)
       };
       console.log('Updating config with:', data);
-      // TODO: store.updateMeasurementConfig(data);
+			store.updateMeasurementConfig(data);
     } catch (error) {
       store.error = error.message;
       console.error('Error updating config:', error);

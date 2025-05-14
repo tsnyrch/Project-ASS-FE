@@ -1,17 +1,17 @@
 <template>
   <error v-if="store.error" :text="store.error" @hide="store.clearError()"></error>
 
-  <v-container>
+  <v-container style="max-width: 1280px;">
     <v-row>
       <v-col>
-        <div class="tw-text-2xl">Dobrý den, {{ first_name }}.</div>
+        <div class="tw-text-2xl tw-mt-4 tw-mb-2">Dobrý den, {{ first_name }}.</div>
       </v-col>
     </v-row>
     <v-row align="start" justify="start">
-      <v-col cols="auto">
+      <v-col cols="12" sm="auto">
         <MeasurementWidget title="Poslední měření" :datetime="store.measurementInfo.lastMeasurement" />
       </v-col>
-      <v-col cols="auto">
+      <v-col cols="12" sm="auto">
         <MeasurementWidget title="Plánované měření" :datetime="store.measurementInfo.plannedMeasurement" />
       </v-col>
     </v-row>
@@ -152,8 +152,8 @@
         number_of_sensors: selectedSensorCount.value,
         length_of_ae: measurementDuration.value
       };
-      // Turned off for debugging...
-      // TODO: store.updateMeasurementConfig(data);
+
+      store.updateMeasurementConfig(data);
 
       store.fetchManualMeasurementConfig().then(() => {
         loadingButton.value = false;

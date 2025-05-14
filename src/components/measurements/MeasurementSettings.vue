@@ -1,11 +1,12 @@
 <template>
-  <v-row>
-    <v-col cols="4">
+  <v-row class="">
+    <v-col cols="12" md="6" class="pl-0 pt-0 pb-0">
       <v-checkbox
         v-model="localMultispectralCameraChecked"
         @change="updateMultispectralCameraChecked($event.target.checked)"
         label="Multispektrální kamera"
         color="#77BE13"
+				class="ml-3"
       ></v-checkbox>
       <v-text-field
         v-model="localMeasurementDuration"
@@ -14,12 +15,13 @@
         class="tw-pl-3"
         label="Délka měření akustické emise"
         placeholder="Zadejte délku v minutách"
-        variant="underlined"
+				density="comfortable"
+				variant="outlined"
       ></v-text-field>
     </v-col>
-    <v-col cols="4" offset="2">
-      <v-checkbox v-model="localRgbCameraChecked" @change="updateRgbCameraChecked($event.target.checked)" label="RGB kamera" color="#77BE13"></v-checkbox>
-      <v-select v-model="localSelectedSensorCount" variant="underlined" label="Počet senzorů" :items="rgbCameraSensors" placeholder="Vyberte počet"></v-select>
+    <v-col cols="12" md="6" class="pt-0">
+      <v-checkbox class="ml-0" v-model="localRgbCameraChecked" @change="updateRgbCameraChecked($event.target.checked)" label="RGB kamera" color="#77BE13"></v-checkbox>
+      <v-select v-model="localSelectedSensorCount" density="comfortable" variant="outlined" label="Počet senzorů" :items="rgbCameraSensors" placeholder="Vyberte počet"></v-select>
     </v-col>
   </v-row>
 </template>

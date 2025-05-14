@@ -5,10 +5,11 @@
         v-bind="props"
         v-model="formattedDate"
         :label="label"
-        prepend-icon="mdi-calendar"
+        prepend-inner-icon="mdi-calendar"
         readonly
         @click:clear="clearDate"
-        class="tw-bg-white tw-rounded-md"
+				density="comfortable"
+				class="tw-bg-white tw-rounded-md"
         variant="outlined"
       ></v-text-field>
     </template>

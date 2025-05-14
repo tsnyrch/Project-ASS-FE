@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <Sidebar v-if="!isLoginRoute" />
-    <v-main>
+    <v-main class="mx-1 mx-sm-3 mx-md-5 mb-12">
       <router-view />
     </v-main>
   </v-app>

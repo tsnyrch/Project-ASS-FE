@@ -1,9 +1,9 @@
 <template>
   <error v-if="store.error" :text="store.error" @hide="store.clearError()"></error>
-  <v-container>
+  <v-container style="max-width: 1280px;">
     <v-row>
       <v-col>
-        <div class="tw-text-2xl">Historie měření</div>
+        <div class="tw-text-2xl tw-mt-4 tw-mb-2">Historie měření</div>
       </v-col>
     </v-row>
     <v-row>
@@ -17,7 +17,7 @@
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row class="tw-mt-0">
       <v-col>
         <v-card class="tw-rounded-xl tw-overflow-hidden tw-border tw-border-gray-100 tw-shadow-sm">
           <v-data-table

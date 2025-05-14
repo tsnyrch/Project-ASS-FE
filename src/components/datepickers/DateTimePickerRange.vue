@@ -5,7 +5,7 @@
         v-bind="props"
         v-model="formattedRange"
         label="Vyberte časové rozmezí"
-        prepend-icon="mdi-calendar-range"
+        prepend-inner-icon="mdi-calendar-range"
         readonly
         @click:clear="clearRange"
         class="tw-bg-white tw-rounded-md"
