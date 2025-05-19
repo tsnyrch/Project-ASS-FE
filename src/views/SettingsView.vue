@@ -2,7 +2,7 @@
   <v-container style="max-width: 1280px;">
     <v-row>
       <v-col>
-        <div class="tw-text-2xl tw-mt-4 tw-mb-2">Nastavení měření</div>
+        <div class="tw-text-2xl tw-mt-4 tw-mb-2">Nastavení</div>
       </v-col>
     </v-row>
 
@@ -79,6 +79,7 @@
   import PrimaryButton from '@/components/button/PrimaryButton.vue';
   import { useMeasurementsStore } from '@/stores/MeasurementsStore';
   import { onMounted } from 'vue';
+	import router from '@/router/index.js';
 
   const emits = defineEmits(['update:measurementFrequency']);
 
@@ -99,7 +100,13 @@
   const measurementDate = ref(measurementsConfig?.value?.firstMeasurement ?? new Date());
 
   onMounted(async () => {
-    loading.value = true;
+		const is_admin = sessionStorage.getItem('is_admin');
+		if (!is_admin) {
+			await router.push("/dashboard")
+			return;
+		}
+
+		loading.value = true;
     await store.fetchLatestMeasurements();
     await store.fetchMeasurementConfig();
 

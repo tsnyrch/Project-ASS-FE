@@ -38,6 +38,9 @@ export const useUserStore = defineStore('user', {
 
         sessionStorage.setItem('first_name', user.first_name || '');
         sessionStorage.setItem('last_name', user.last_name || '');
+        sessionStorage.setItem('is_admin', user.is_admin || '');
+
+        console.log(this.token);
 
         this.error = null;
         this.isLoggedIn = true;
@@ -67,6 +70,7 @@ export const useUserStore = defineStore('user', {
       localStorage.removeItem('token');
       sessionStorage.removeItem('first_name');
       sessionStorage.removeItem('last_name');
+      sessionStorage.removeItem('is_admin');
       this.isLoggedIn = false;
     },
 
@@ -98,14 +102,6 @@ export const useUserStore = defineStore('user', {
           return Promise.reject(error);
         }
       );
-    },
-
-    // Clear auth and token
-    async logout() {
-      this.token = null;
-      delete axios.defaults.headers.common['Authorization'];
-      localStorage.removeItem('token');
-      this.isLoggedIn = false;
     },
 
     // Get user list

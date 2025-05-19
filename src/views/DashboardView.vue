@@ -18,7 +18,7 @@
 
     <v-row>
       <v-col>
-        <v-card class="tw-py-5 tw-px-6 tw-shadow-sm tw-rounded-xl tw-bg-gradient-to-r tw-from-white tw-to-light-grey/10 tw-border tw-border-gray-100">
+        <v-card v-if="is_admin" class="tw-py-5 tw-px-6 tw-shadow-sm tw-rounded-xl tw-bg-gradient-to-r tw-from-white tw-to-light-grey/10 tw-border tw-border-gray-100">
           <v-row class="tw-flex tw-justify-between tw-items-center">
             <v-col>
               <v-card-title class="tw-pl-1 tw-font-semibold">Manuální měření</v-card-title>
@@ -100,6 +100,7 @@
   import Error from '../components/Error.vue';
   import { formatDateMinutes } from '../utils';
   import moment from 'moment';
+	import router from '@/router/index.js';
 
   const store = useMeasurementsStore();
   const loading = ref(true);
@@ -113,9 +114,11 @@
   const selectedSensorCount = ref(measurementsConfig.value.number_of_sensors);
   const rgbCameraSensors = ref([1, 2, 3, 4, 5, 6]);
   const first_name = ref(sessionStorage.getItem('first_name'));
-  const loadingButton = ref(false);
+	const is_admin = ref(sessionStorage.getItem('is_admin'));
+	const loadingButton = ref(false);
 
-  onMounted(async () => {
+
+	onMounted(async () => {
     await store.fetchLatestMeasurements();
 
     loading.value = true;

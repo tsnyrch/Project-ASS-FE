@@ -35,8 +35,8 @@
               <v-toolbar flat dense class="tw-bg-white tw-border-b tw-border-gray-100">
                 <v-toolbar-title class="tw-font-medium">
                   Měření mezi
-                  {{ moment(defaultStartDate).format('DD.MM.YYYY HH:mm:ss') }}
-                  – {{ moment(defaultEndDate).format('DD.MM.YYYY HH:mm:ss') }}
+                  {{ moment(defaultStartDate).format('DD.MM.YYYY HH:mm') }}
+                  – {{ moment(defaultEndDate).format('DD.MM.YYYY HH:mm') }}
                 </v-toolbar-title>
               </v-toolbar>
             </template>

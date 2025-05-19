@@ -22,11 +22,16 @@
         <div class="tw-w-auto tw-border-t-2 tw-border-light-grey">
           <v-menu open-on-hover location="top">
             <template v-slot:activator="{ props }">
-              <v-btn class="tw-w-full" variant="text" v-bind="props" :prepend-icon="isSmallScreen ? undefined : 'mdi-account-circle-outline'">
+              <v-btn class="tw-w-full" variant="text" v-bind="props">
                 <template v-if="isSmallScreen">
-                  <v-icon>mdi-account-circle-outline</v-icon>
+									<v-icon class="pr-3 tw-text-mendelu-green" style="font-size: 22px;" v-if="is_admin">mdi-account-cog</v-icon>
+									<v-icon class="pr-3 tw-text-gray-500" style="font-size: 22px;" v-else>mdi-account</v-icon>
                 </template>
-                <template v-else>{{ first_name }} {{ last_name }}</template>
+                <template v-else>
+									<v-icon class="pr-3 tw-text-mendelu-green" style="font-size: 22px;" v-if="is_admin">mdi-account-cog</v-icon>
+									<v-icon class="pr-3 tw-text-gray-400" style="font-size: 22px;" v-else>mdi-account</v-icon>
+									<span style="font-size: 12px;">{{ first_name }} {{ last_name }}</span>
+								</template>
               </v-btn>
             </template>
 
@@ -46,7 +51,7 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue';
+import { computed, ref } from 'vue';
   import { useUserStore } from '@/stores/UserStore.js';
   import router from '@/router/index.js';
 
@@ -54,29 +59,37 @@
   const store = useUserStore();
   const first_name = sessionStorage.getItem('first_name');
   const last_name = sessionStorage.getItem('last_name');
+	const is_admin = sessionStorage.getItem('is_admin');
 
-  const navItems = [
-    {
-      title: 'Přehled',
-      icon: 'mdi-view-dashboard-outline',
-      to: { name: 'dashboard' }
-    },
-    {
-      title: 'Historie měření',
-      icon: 'mdi-history',
-      to: { name: 'history' }
-    },
-    {
-      title: 'Nastavení',
-      icon: 'mdi-cog-outline',
-      to: { name: 'settings' }
-    },
-    {
-      title: 'Uživatelé',
-      icon: 'mdi-account-multiple-outline',
-      to: { name: 'users' }
-    }
-  ];
+  const navItems = computed(() => {
+		const tabs = [
+			{
+				title: 'Přehled',
+				icon: 'mdi-view-dashboard-outline',
+				to: { name: 'dashboard' }
+			},
+			{
+				title: 'Historie měření',
+				icon: 'mdi-history',
+				to: { name: 'history' }
+			}
+		];
+		if (is_admin) {
+			tabs.push(
+				{
+					title: 'Nastavení',
+					icon: 'mdi-cog-outline',
+					to: { name: 'settings' }
+				},
+				{
+					title: 'Uživatelé',
+					icon: 'mdi-account-multiple-outline',
+					to: { name: 'users' }
+				}
+			);
+		}
+		return tabs;
+	});
 
   window.addEventListener('resize', () => {
     isSmallScreen.value = window.innerWidth < 960;
