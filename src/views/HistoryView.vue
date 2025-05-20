@@ -58,7 +58,16 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-              <PrimaryButton text="Stáhnout" @click="downloadData(item.id || item.raw?.id)" />
+              <v-tooltip v-if="!(item.files?.length > 0 || item.raw?.files?.length > 0)" location="top" text="Žádné soubory k dispozici">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" class="tw-rounded-xl tw-normal-case" size="small" color="grey-lighten-1" disabled>Stáhnout</v-btn>
+                </template>
+              </v-tooltip>
+              <PrimaryButton 
+                v-else
+                text="Stáhnout" 
+                @click="downloadData(item.id || item.raw?.id)" 
+              />
             </template>
           </v-data-table>
 
@@ -155,11 +164,13 @@
   );
 
   const downloadData = async (itemId) => {
-    const blob = await store.downloadMeasurementZip(itemId);
+    const response = await store.downloadMeasurementFromDrive(itemId);
+    if (!response || !response.blob) return;
+    
     const e = document.createEvent('MouseEvents'),
       a = document.createElement('a');
-    a.download = Date.now().toString() + '.zip';
-    a.href = window.URL.createObjectURL(blob);
+    a.download = response.filename;
+    a.href = window.URL.createObjectURL(response.blob);
     a.dataset.downloadurl = ['application/zip', a.download, a.href].join(':');
     e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
     a.dispatchEvent(e);

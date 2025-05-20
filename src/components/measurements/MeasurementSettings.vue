@@ -3,7 +3,6 @@
     <v-col cols="12" md="6" class="pl-0 pt-0 pb-0">
       <v-checkbox
         v-model="localMultispectralCameraChecked"
-        @change="updateMultispectralCameraChecked($event.target.checked)"
         label="Multispektrální kamera"
         color="#77BE13"
 				class="ml-3"
@@ -20,7 +19,7 @@
       ></v-text-field>
     </v-col>
     <v-col cols="12" md="6" class="pt-0">
-      <v-checkbox class="ml-0" v-model="localRgbCameraChecked" @change="updateRgbCameraChecked($event.target.checked)" label="RGB kamera" color="#77BE13"></v-checkbox>
+      <v-checkbox class="ml-0" v-model="localRgbCameraChecked" label="RGB kamera" color="#77BE13"></v-checkbox>
       <v-select v-model="localSelectedSensorCount" density="comfortable" variant="outlined" label="Počet senzorů" :items="rgbCameraSensors" placeholder="Vyberte počet"></v-select>
     </v-col>
   </v-row>
@@ -51,16 +50,14 @@
   watch(localSelectedSensorCount, (newValue) => {
     emits('update:selectedSensorCount', newValue);
   });
+  
+  watch(localMultispectralCameraChecked, (newValue) => {
+    emits('update:multispectralCameraChecked', newValue);
+  });
 
-  function updateMultispectralCameraChecked(value) {
-    localMultispectralCameraChecked.value = value;
-    emits('update:multispectralCameraChecked', value);
-  }
-
-  function updateRgbCameraChecked(value) {
-    localRgbCameraChecked.value = value;
-    emits('update:rgbCameraChecked', value);
-  }
+  watch(localRgbCameraChecked, (newValue) => {
+    emits('update:rgbCameraChecked', newValue);
+  });
 
   onUpdated(() => {
     localMeasurementDuration.value = props.measurementDuration;

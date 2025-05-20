@@ -40,8 +40,6 @@ export const useUserStore = defineStore('user', {
         sessionStorage.setItem('last_name', user.last_name || '');
         sessionStorage.setItem('is_admin', user.is_admin || '');
 
-        console.log(this.token);
-
         this.error = null;
         this.isLoggedIn = true;
       } catch (e) {

@@ -119,20 +119,21 @@
     loading.value = false;
   });
 
-  function updateConfig() {
+  async function updateConfig() {
     try {
       const data = {
         measurement_frequency: Number(measurementFrequency.value),
         first_measurement: measurementDate.value,
-        rgb_camera: rgbCameraChecked.value,
-        multispectral_camera: multispectralCameraChecked.value,
+        rgb_camera: rgbCameraChecked.value === true,
+        multispectral_camera: multispectralCameraChecked.value === true,
         number_of_sensors: selectedSensorCount.value,
         length_of_ae: Number(measurementDuration.value)
       };
       console.log('Updating config with:', data);
-			store.updateMeasurementConfig(data);
+      const result = await store.updateMeasurementConfig(data);
+      console.log('Config updated successfully:', result);
     } catch (error) {
-      store.error = error.message;
+      store.error = error.message || 'Error updating configuration';
       console.error('Error updating config:', error);
     }
   }
@@ -142,7 +143,8 @@
   });
 
   function updateMultispectralCameraChecked(value) {
-    multispectralCameraChecked.value = value;
+    console.log("Setting multispectralCameraChecked to:", value);
+    multispectralCameraChecked.value = value === true;
   }
 
   function updateMeasurementDuration(value) {
@@ -150,7 +152,8 @@
   }
 
   function updateRgbCameraChecked(value) {
-    rgbCameraChecked.value = value;
+    console.log("Setting rgbCameraChecked to:", value);
+    rgbCameraChecked.value = value === true;
   }
 
   function updateSelectedSensorCount(value) {
