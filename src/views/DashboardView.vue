@@ -29,7 +29,7 @@
             </v-col>
 
             <v-col class="tw-flex tw-justify-end">
-              <LoadingButton :loading="loadingButton" text="Zahájit měření" loading-text="Probíhá měření" size="large" @click="updateConfig()" />
+              <LoadingButton :loading="loadingButton" text="Zahájit měření" loading-text="Probíhá měření" size="large" @click="startMeasurement()" />
             </v-col>
           </v-row>
 
@@ -110,7 +110,7 @@
 
   const multispectralCameraChecked = ref(measurementsConfig.value.multispectral_camera);
   const measurementDuration = ref(measurementsConfig.value.length_of_ae);
-  const rgbCameraChecked = ref(measurementsConfig.value.rgb_camera);
+	const rgbCameraChecked = ref(measurementsConfig.value.rgb_camera);
   const selectedSensorCount = ref(measurementsConfig.value.number_of_sensors);
   const rgbCameraSensors = ref([1, 2, 3, 4, 5, 6]);
   const first_name = ref(sessionStorage.getItem('first_name'));
@@ -143,27 +143,25 @@
 
   const showSettings = ref(false);
 
-  function updateConfig() {
+  async function startMeasurement() {
     loadingButton.value = true;
+
     try {
-      const currentTime = moment().local().toISOString();
       const data = {
-        measurement_frequency: 60,
-        first_measurement: currentTime,
+        measurement_frequency: measurementsConfig.value.measurement_frequency,
+        first_measurement: measurementsConfig.value.first_measurement,
         rgb_camera: rgbCameraChecked.value,
         multispectral_camera: multispectralCameraChecked.value,
         number_of_sensors: selectedSensorCount.value,
         length_of_ae: measurementDuration.value
       };
 
-			// TODO: send data to /start endpoint, do not update separately
-      // store.updateMeasurementConfig(data);
-
-      store.fetchManualMeasurementConfig().then(() => {
-        loadingButton.value = false;
-      });
+      await store.startManualMeasurement(data)
+			loadingButton.value = false;
+			await store.fetchLatestMeasurements();
     } catch (error) {
       store.error = error.message;
+			loadingButton.value = false;
     }
   }
 

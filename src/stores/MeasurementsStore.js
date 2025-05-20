@@ -46,21 +46,19 @@ export const useMeasurementsStore = defineStore('measurements', {
       }
     },
 
-    async fetchManualMeasurementConfig() {
+    async startManualMeasurement(data) {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.post(
+        await axios.post(
           `${config.backendUrl}/measurements/start`,
-          {},
+          data,
           {
             headers: {
               Authorization: 'Bearer ' + token
             }
           }
         );
-        this.measurementConfig = response.data;
         this.error = null;
-        return response.data;
       } catch (error) {
         this.error = 'Cannot get manual measurement configuration ' + error;
       }
