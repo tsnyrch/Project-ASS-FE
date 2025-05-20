@@ -103,7 +103,7 @@
 
 		<v-row>
 			<v-col>
-				<div class="tw-text-xl tw-font-medium tw-mb-4 tw-mt-6">Seznam uživatel</div>
+				<div class="tw-text-xl tw-font-medium tw-mb-4 tw-mt-6">Seznam uživatelů</div>
 			</v-col>
 		</v-row>
 
@@ -115,20 +115,41 @@
 				>
 					<v-row class="pa-1">
 						<v-col cols="12" sm="8">
-							<v-card-title class="d-flex justify-start align-center text-body-1">
-								<v-icon class="pr-3 tw-text-mendelu-green" v-if="user.is_admin">mdi-account-cog</v-icon>
-								<v-icon class="pr-3 tw-text-gray-400" v-else>mdi-account</v-icon>
+							<v-card-title class="d-flex justify-start text-body-1">
+								<v-icon class="pr-3 tw-text-gray-500 me-1" v-if="user.is_admin">mdi-account-cog</v-icon>
+								<v-icon class="pr-3 tw-text-gray-500 me-1" v-else>mdi-account</v-icon>
 								<span class="tw-font-medium">{{ user.first_name }} {{ user.last_name }}</span>
 							</v-card-title>
 						</v-col>
 						<v-col cols="12" sm="4" class="tw-flex tw-items-center tw-justify-end">
-							<v-chip size="small" class="tw-mr-2 tw-bg-light-grey">{{ user.user_name }}</v-chip>
-							<v-icon size="small" class="tw-text-gray-500">mdi-dots-vertical</v-icon>
+							<v-chip size="small" class="tw-mr-1 tw-bg-light-grey">{{ user.user_name }}</v-chip>
+							<v-btn
+								v-if="user.id !== 1"
+								@click="userIdToDelete = user.id"
+								icon
+								density="comfortable"
+								variant="plain"
+							>
+								<v-icon>mdi-trash-can</v-icon>
+							</v-btn>
 						</v-col>
 					</v-row>
 				</v-card>
 			</v-col>
 		</v-row>
+
+		<v-dialog v-model="userIdToDelete" max-width="400">
+			<v-card class="pa-2">
+				<v-card-title class="text-h6">Smazat uživatele</v-card-title>
+				<v-card-text>Opravdu chcete smazat uživatele?</v-card-text>
+
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn variant="text" @click="userIdToDelete = null">Ne</v-btn>
+					<v-btn color="error" variant="text" @click="deleteUser(userIdToDelete)">Ano</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 	</v-container>
 </template>
 
@@ -159,6 +180,8 @@
 	const visible = ref(false);
 	const isAdmin = ref(false);
 
+	const userIdToDelete = ref(null);
+
 	const errors = ref({
     firstName: '',
     lastName: '',
@@ -187,6 +210,17 @@
     errors.value[field] = '';
   };
 
+	async function deleteUser(userId)	{
+		try {
+			await store.deleteUser(userId);
+			await store.fetchUsers();
+		} catch (error) {
+			store.error = error.message;
+			console.error('Failed to delete user:', error);
+		}
+		userIdToDelete.value = null;
+	}
+
   async function addUser() {
     if (!validateAllFields()) {
       return;
@@ -212,7 +246,6 @@
       Object.keys(errors.value).forEach((key) => (errors.value[key] = ''));
     } catch (error) {
       store.error = error.message;
-
       console.error('Failed to add user:', error);
     }
   }

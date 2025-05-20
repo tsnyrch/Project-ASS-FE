@@ -24,13 +24,13 @@
             <template v-slot:activator="{ props }">
               <v-btn class="tw-w-full" variant="text" v-bind="props">
                 <template v-if="isSmallScreen">
-									<v-icon class="pr-3 tw-text-mendelu-green" style="font-size: 22px;" v-if="is_admin">mdi-account-cog</v-icon>
+									<v-icon class="pr-3 tw-text-gray-500" style="font-size: 23px;" v-if="is_admin">mdi-account-cog</v-icon>
 									<v-icon class="pr-3 tw-text-gray-500" style="font-size: 22px;" v-else>mdi-account</v-icon>
                 </template>
                 <template v-else>
-									<v-icon class="pr-3 tw-text-mendelu-green" style="font-size: 22px;" v-if="is_admin">mdi-account-cog</v-icon>
-									<v-icon class="pr-3 tw-text-gray-400" style="font-size: 22px;" v-else>mdi-account</v-icon>
-									<span style="font-size: 12px;">{{ first_name }} {{ last_name }}</span>
+									<v-icon class="pr-3 tw-text-gray-500" style="font-size: 23px;" v-if="is_admin">mdi-account-cog</v-icon>
+									<v-icon class="pr-3 tw-text-gray-500" style="font-size: 22px;" v-else>mdi-account</v-icon>
+									<span style="font-size: 13px;">{{ first_name }} {{ last_name }}</span>
 								</template>
               </v-btn>
             </template>

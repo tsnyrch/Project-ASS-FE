@@ -108,7 +108,7 @@ export const useUserStore = defineStore('user', {
     async fetchUsers() {
       try {
         const token = this.token || localStorage.getItem('token');
-        const response = await axios.get(`${config.backendUrl}/users`, {
+        const response = await axios.get(`${config.backendUrl}/users/`, {
           headers: {
             Authorization: 'Bearer ' + token
           }
@@ -124,7 +124,7 @@ export const useUserStore = defineStore('user', {
     async addUser(data) {
       try {
         const token = this.token || localStorage.getItem('token');
-        const response = await axios.post(`${config.backendUrl}/users`, data, {
+        const response = await axios.post(`${config.backendUrl}/users/`, data, {
           headers: {
             Authorization: 'Bearer ' + token
           }
@@ -133,6 +133,20 @@ export const useUserStore = defineStore('user', {
         this.error = null;
       } catch (error) {
         this.error = 'Cannot add user ' + error;
+      }
+    },
+
+    async deleteUser(userId) {
+      try {
+        const token = this.token || localStorage.getItem('token');
+        await axios.delete(`${config.backendUrl}/users/${userId}`, {
+          headers: {
+            Authorization: 'Bearer ' + token
+          }
+        });
+        this.error = null;
+      } catch (error) {
+        this.error = 'Cannot delete user ' + error;
       }
     },
 

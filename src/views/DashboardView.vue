@@ -156,7 +156,8 @@
         length_of_ae: measurementDuration.value
       };
 
-      store.updateMeasurementConfig(data);
+			// TODO: send data to /start endpoint, do not update separately
+      // store.updateMeasurementConfig(data);
 
       store.fetchManualMeasurementConfig().then(() => {
         loadingButton.value = false;
